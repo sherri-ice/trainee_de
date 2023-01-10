@@ -7,6 +7,6 @@ if __name__ == "__main__":
     # check flags
     # здесь что-то типа если таблица не создана, то создать и загрузить туда все данные
     student_dao = StudentDAO()
-    student_dao.upload_file("students.json")
-    print(student_dao.get_students())
+    student_dao.upload_file("sample_data/students.json")
+    print(len(student_dao.get_students()))
 

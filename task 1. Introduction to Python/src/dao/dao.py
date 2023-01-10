@@ -3,6 +3,8 @@ import json
 
 from db import db_connector as connector
 
+config = json.load(open("config.json"))
+
 
 def parse_json_file(json_file_path):
     with open(json_file_path, 'r') as json_file:
@@ -11,11 +13,8 @@ def parse_json_file(json_file_path):
         column_names = []
         for current_dict in data:
             row = []  # maybe ()
-            column_names = list(current_dict.keys())
-            column_names.remove('id')
+            column_names = current_dict.keys()
             for column_name, value in current_dict.items():
-                if column_name == 'id':
-                    continue
                 row.append(value)
             rows.append(row)
     return column_names, rows
@@ -30,10 +29,10 @@ class DAO:
             # todo: create database if it's not
             print("SQL connector wasn't defined, creating MySQL connector...")
             self._db_connector = connector.DBConnector(
-                host="localhost",
-                username="user",
-                password="password",
-                database="hostel"
+                host=config['host'],
+                username=config['username'],
+                password=config['password'],
+                database=config['database']
             )
         else:
             self._db_connector = db_connector
