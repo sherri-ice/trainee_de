@@ -13,12 +13,21 @@ class DBConnector:
         )
         self.__cursor__ = self.__connection__.cursor()
 
-    def execute_query(self, query, fetch_policy="all"):
+    def execute_query(self, query):
         self.__cursor__.execute(query)
-        if fetch_policy == "all":
-            return self.__cursor__.fetchall()
-        elif fetch_policy == "one":
-            return self.__cursor__.fetchone()
+
+    def execute_many_queries(self, query, values):
+        self.__cursor__.executemany(query, values)
+
+    def fetch_all(self):
+        return self.__cursor__.fetchall()
+
+    def fetch_one(self):
+        return self.__cursor__.fetchone()
+
+    def commit_changes(self):
+        self.__connection__.commit()
 
     def close_connection(self):
         self.__connection__.close()
+
