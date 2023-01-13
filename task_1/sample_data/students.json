@@ -1,12 +1,5 @@
 [
     {
-        "birthday": "2011-08-22T00:00:00.000000",
-        "id": 0,
-        "name": "Peggy Ryan",
-        "room": 473,
-        "sex": "M"
-    },
-    {
         "birthday": "2004-01-07T00:00:00.000000",
         "id": 1,
         "name": "Christian Bush",
