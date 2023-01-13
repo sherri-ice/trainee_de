@@ -2,7 +2,7 @@ import json
 
 
 class DBConfigHelper:
-    def __init__(self, config_path: str = "configs/db_config.json"):
+    def __init__(self, config_path: str = "sql/configs/db_config.json"):
         with open(config_path, 'r') as config_file:
             config = json.load(config_file)
             self._db_host = config['db_host']

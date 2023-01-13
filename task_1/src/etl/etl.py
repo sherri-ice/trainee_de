@@ -1,12 +1,12 @@
 import os
 
-from task_1.configs.db_config_helper import DBConfigHelper
-from sql_connector.sql_connector import SqlConnector
-from sql_connector.queries_manager import QueryManager
+from task_1.sql.configs.db_config_helper import DBConfigHelper
+from task_1.sql.sql_connector.sql_connector import SqlConnector
+from task_1.sql.sql_connector.queries_manager import QueryManager
 from object_helper.base_object_helper import BaseObjectHelper
 
 import pandas as pd
-from typing import Tuple, Callable
+from typing import Tuple
 
 
 class ETL:

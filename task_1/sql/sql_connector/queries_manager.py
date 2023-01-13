@@ -3,7 +3,7 @@ import re
 
 
 class QueryManager:
-    def __init__(self, queries_dir: str = "sql_queries"):
+    def __init__(self, queries_dir: str = "sql/sql_queries"):
         self._queries_dir = os.path.join(os.getcwd(), queries_dir)
         self._queries_dict = self._load_queries()
 
