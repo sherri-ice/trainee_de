@@ -12,8 +12,6 @@ class RoomHelper(BaseObjectHelper):
     def object_name(self) -> str:
         return self._object_name
 
-    def set_data_source(self, path_to_file: str) -> None:
-        self._source_file_path = path_to_file
-
     def load_data_to_df(self) -> pd.DataFrame:
+        super().load_data_to_df()
         return pd.read_json(self._source_file_path)

@@ -14,7 +14,6 @@ class QueryManager:
             for filename in os.listdir(cur_path):
                 with open(os.path.join(cur_path, filename), 'r') as file:
                     query_dict[os.path.splitext(filename)[0]] = re.sub(' +', ' ', re.sub('\n', ' ', file.read()))
-        print(query_dict)
         return query_dict
 
     @property

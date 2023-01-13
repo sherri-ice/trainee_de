@@ -4,17 +4,16 @@ from task_1.sql.configs.db_config_helper import DBConfigHelper
 from task_1.sql.sql_connector.sql_connector import SqlConnector
 from task_1.sql.sql_connector.queries_manager import QueryManager
 from object_helper.base_object_helper import BaseObjectHelper
+from task_1.logs.logger import Logger
 
 import pandas as pd
 from typing import Tuple
-import logging
 
-logger = logging.getLogger(__name__)
+logger = Logger.__call__().get_logger()
 
 
 class ETL:
     def __init__(self, object_helpers: list[BaseObjectHelper]):
-        logger.info("Test")
         self.df_data = None
         self.__db_credentials__ = DBConfigHelper().get_credentials()
         self.__db__ = SqlConnector(self.__db_credentials__)
@@ -56,11 +55,19 @@ class ETL:
             self.select_5_lowest_avg_age_rooms,
             self.select_rooms_with_different_gender
         ]:
+
+            logger.info(f"Starting query: {func.__name__}")
+            try:
+                df = func()
+            except Exception as e:
+                logger.exception(e)
+                continue
+            logger.info(f"Query {func.__name__} successfully ended")
             output_dir = os.path.join(os.getcwd(), f'output/{output_format}')
             output_path = os.path.join(output_dir, f'{func.__name__}.{output_format}')
+            logger.info(f"Saving results to {output_path}")
             if not os.path.exists(output_dir):
                 os.mkdir(output_dir)
-            df = func()
             if output_format == 'json':
                 df.to_json(output_path)
             elif output_format == 'xml':
@@ -68,7 +75,7 @@ class ETL:
 
     def load(self):
         for table_name, dataframe in self.df_data:
-            print(table_name)
+            logger.info(f"Writing {table_name} to database...")
             self.__db__.write_df_to_db(
                 df=dataframe,
                 db_credentials=self.__db_credentials__,

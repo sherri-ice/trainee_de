@@ -1,15 +1,17 @@
 import logging.config
+
+import pandas as pd
 import yaml
 import logging
 
 
 class SingletonType(type):
-    _instances = {}
+    _instance = None
 
     def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(SingletonType, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
+        if not cls._instance:
+            cls._instance = super(SingletonType, cls).__call__(*args, **kwargs)
+        return cls._instance
 
 
 class Logger(metaclass=SingletonType):

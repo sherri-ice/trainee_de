@@ -1,7 +1,7 @@
-from src.etl.etl import ETL
-from src.object_helper.student_helper import StudentHelper
-from src.object_helper.room_helper import RoomHelper
-from logs.logger import Logger
+from task_1.src.etl.etl import ETL
+from task_1.src.object_helper.student_helper import StudentHelper
+from task_1.src.object_helper.room_helper import RoomHelper
+from task_1.logs.logger import Logger
 
 import argparse
 

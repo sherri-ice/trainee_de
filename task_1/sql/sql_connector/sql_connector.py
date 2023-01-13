@@ -1,6 +1,11 @@
+from task_1.logs.logger import Logger
+
 from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
 
 import pandas as pd
+
+logger = Logger.__call__().get_logger()
 
 
 class SqlConnector:
@@ -12,9 +17,14 @@ class SqlConnector:
         return self.__engine_connect__.execute(tables_query, multi=True)
 
     def __init__(self, db_credentials: str):
-        # todo: try и логи на проверку коннекшена
+        logger.info("Creating connection to database...")
         self.__engine__ = create_engine(db_credentials)
-        self.__engine_connect__ = self.__engine__.connect()
+        try:
+            self.__engine_connect__ = self.__engine__.connect()
+        except SQLAlchemyError as err:
+            logger.exception(err)
+            exit(1)
+        logger.info("Connection created successful")
 
     def execute_query(self, query: str):
         return self.__engine_connect__.execute(query)
@@ -28,6 +38,3 @@ class SqlConnector:
             if_exists='replace',
             index=False
         )
-
-    def get_df_from_db(self):
-        ...
