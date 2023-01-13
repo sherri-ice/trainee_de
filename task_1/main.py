@@ -1,8 +1,11 @@
 from src.etl.etl import ETL
 from src.object_helper.student_helper import StudentHelper
 from src.object_helper.room_helper import RoomHelper
+from logs.logger import Logger
 
 import argparse
+
+logger = Logger.__call__().get_logger()
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -42,4 +45,7 @@ def showcase(student_source_path: str, room_source_path: str, export_result_type
 
 
 if __name__ == "__main__":
+    logger.info("Starting...")
     showcase(args.students_source_file, args.rooms_source_file, args.export_result_type)
+    logger.info("Finishing...")
+

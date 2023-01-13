@@ -7,10 +7,14 @@ from object_helper.base_object_helper import BaseObjectHelper
 
 import pandas as pd
 from typing import Tuple
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ETL:
     def __init__(self, object_helpers: list[BaseObjectHelper]):
+        logger.info("Test")
         self.df_data = None
         self.__db_credentials__ = DBConfigHelper().get_credentials()
         self.__db__ = SqlConnector(self.__db_credentials__)

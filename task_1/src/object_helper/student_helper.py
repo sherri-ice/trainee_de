@@ -8,8 +8,6 @@ class StudentHelper(BaseObjectHelper):
     def __init__(self):
         super().__init__(object_name="Students", source_file_path="sample_data/students.json")
 
-
-
     @property
     def object_name(self) -> str:
         return self._object_name
