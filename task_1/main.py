@@ -11,6 +11,6 @@ if __name__ == "__main__":
     etl = ETL([student_helper, room_helper])
     etl.extract()
     etl.load()
-    print(etl.select_rooms_with_different_gender())
+    etl.export_results(output_format='xml')
 
 
