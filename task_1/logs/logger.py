@@ -18,12 +18,18 @@ class Logger(metaclass=SingletonType):
     _logger = None
 
     def __init__(self):
-        with open('logs/logger_config.yaml', 'r') as f:
-            log_cfg = yaml.safe_load(f.read())
-            logging.config.dictConfig(log_cfg)
+        try:
+            with open('logs/logger_config.yaml', 'r') as f:
+                log_cfg = yaml.safe_load(f.read())
+                logging.config.dictConfig(log_cfg)
+        except FileNotFoundError as exc:
             self._logger = logging.getLogger(__name__)
             self._logger.setLevel(logging.INFO)
-            self._logger.info("Logger init...")
+            self._logger.warning("Config for logger not found, consider to take default logger...")
+            return
+        self._logger = logging.getLogger(__name__)
+        self._logger.setLevel(logging.INFO)
+        self._logger.info("Logger init...")
 
     def get_logger(self):
         return self._logger

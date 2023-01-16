@@ -1,7 +1,7 @@
 from task_1.logs.logger import Logger
 
 from sqlalchemy import create_engine
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import DBAPIError
 
 import pandas as pd
 
@@ -21,9 +21,9 @@ class SqlConnector:
         self.__engine__ = create_engine(db_credentials)
         try:
             self.__engine_connect__ = self.__engine__.connect()
-        except SQLAlchemyError as err:
-            logger.exception(err)
-            exit(1)
+        except DBAPIError as exp:
+            logger.exception(exp)
+            raise exp
         logger.info("Connection created successful")
 
     def execute_query(self, query: str):
