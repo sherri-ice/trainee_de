@@ -21,8 +21,7 @@ Let's create database `hostel` and create table `Students` and `Rooms`. Full des
 stored in sql files: [create_students_table.sql](sql%2Fsql_queries%2Fcreation%2Fcreate_students_table.sql),
 [create_rooms_table.sql](sql%2Fsql_queries%2Fcreation%2Fcreate_rooms_table.sql).
 
-## Code structure
-
+All queries are stored in [sql_queries](sql%2Fsql_queries) directories as sql files.
 
 
 ## Installing dependencies
