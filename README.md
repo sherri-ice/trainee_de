@@ -1,5 +1,6 @@
-# trainee_de
-Repositiry for internship tasks as Data Engenieer intern at Innowise Group.
+# Data Engineer Internship Repositiry
+
+Repositiry for internship tasks as Data Engineer intern at Innowise Group.
 
 All tasks are divided by folders. Each folder contains it's own readme.md with task description and some notes solution.
 
