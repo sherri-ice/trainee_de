@@ -1,12 +1,42 @@
 # Task 1. Introduction to Python
 
-## Поставновка задачи:
-Есть описание общежития универа. Есть описание студентов, а также помещений общежития.
-Необходимо разработать программу, которая хранила бы данные в БД, а также умела делать запросы следующего вида:
+This is an **_educational project_**. It's aimed at have a practice with simple ETL process
+realisation using Python. 
 
-1) Узнать сколько комнат и сколько студентов в каждой из комнат
-2) Показать 5 комнат, где самый маленький средний возраст сотрудников
-3) Показать 5 комнат, где самая большая разница в возрасте между сотрудниками
-4) Показать комнаты, где живут разнополые студенты
+## Task description:
 
-БД: MySQL.
+There are two datasets:
+[rooms.json](sample_data%2Frooms.json) and [students.json](sample_data%2Fstudents.json). The extraction
+from json and load to database processes are need to be done.
+
+Also program must perform 4 types of select queries:
+1) Determine how many rooms are there and how many students are in each room
+2) Select 5 rooms which has the lowest average age
+3) Select 5 rooms which has the biggest age difference
+4) Select rooms where different genders are living together
+
+## About database
+As DBMS, I chose **MySQL**. 
+Let's create database `hostel` and create table `Students` and `Rooms`. Full description of necessary tables are 
+stored in sql files: [create_students_table.sql](sql%2Fsql_queries%2Fcreation%2Fcreate_students_table.sql),
+[create_rooms_table.sql](sql%2Fsql_queries%2Fcreation%2Fcreate_rooms_table.sql).
+
+## Code structure
+
+
+
+## Installing dependencies
+Use pip install -r requirements.txt to install packages
+
+## Running the code
+To run the code you need to launch `main.py` file
+
+## Python tests
+All tests for this project are located in /tests/ folder. 
+You can create your own tests and run them by using the following command `pytest --cov-report term-missing --cov=..`
+To ignore files for testing you can amend .coveragerc file.
+
+## Code refactoring using pre-commit
+If you want to continue the development you can use .pre-commit-config.yaml to 
+check and refactor your code. To do this just simply run `pre-commit run --all-files --show-diff-on-failure` in terminal.
+
