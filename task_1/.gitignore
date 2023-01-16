@@ -1,2 +1,3 @@
 sql/configs/db_config.json
 logs/logs
+/output/

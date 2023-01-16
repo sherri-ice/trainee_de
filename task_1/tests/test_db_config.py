@@ -7,7 +7,7 @@ import pytest
 from sqlalchemy.exc import DBAPIError
 
 from task_1.sql.configs.db_config_helper import DBConfigHelper
-from task_1.sql.sql_connector.sql_connector import SqlConnector
+from task_1.sql.sql_connector.sql_connector import SQLConnector
 
 
 # todo: Group tests?
@@ -41,7 +41,7 @@ def test_can_instantiate_db_connection():
     config_helper = DBConfigHelper(
         config_path='test_db/samples/db_config_test.json',
     )
-    SqlConnector(config_helper.get_credentials())
+    SQLConnector(config_helper.get_credentials())
 
 
 def test_wrong_db_credentials():
@@ -49,4 +49,4 @@ def test_wrong_db_credentials():
         config_path='test_db/samples/db_wrong_config_test.json',
     )
     with pytest.raises(DBAPIError):
-        SqlConnector(config_helper.get_credentials())
+        SQLConnector(config_helper.get_credentials())

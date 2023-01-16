@@ -8,7 +8,7 @@ from object_helper.base_object_helper import BaseObjectHelper
 from task_1.logs.logger import Logger
 from task_1.sql.configs.db_config_helper import DBConfigHelper
 from task_1.sql.queries_manager.queries_manager import QueryManager
-from task_1.sql.sql_connector.sql_connector import SqlConnector
+from task_1.sql.sql_connector.sql_connector import SQLConnector
 
 logger = Logger.__call__().get_logger()
 
@@ -27,7 +27,7 @@ class ETL:
         self.__db_credentials__ = DBConfigHelper(
             config_path=db_config_path,
         ).get_credentials()
-        self.__db__ = SqlConnector(self.__db_credentials__)
+        self.__db__ = SQLConnector(self.__db_credentials__)
         self.__object_helpers__ = object_helpers
         self.__queries__ = QueryManager(
             queries_dir=sql_queries_dir,
