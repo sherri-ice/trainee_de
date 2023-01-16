@@ -5,8 +5,8 @@ from object_helper.base_object_helper import BaseObjectHelper
 
 class RoomHelper(BaseObjectHelper):
 
-    def __init__(self):
-        super().__init__(object_name="Rooms", source_file_path="sample_data/rooms.json")
+    def __init__(self, source_file_path="sample_data/rooms.json"):
+        super().__init__(object_name="Rooms", source_file_path=source_file_path)
 
     @property
     def object_name(self) -> str:

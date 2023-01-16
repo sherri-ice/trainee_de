@@ -1,3 +1,4 @@
+import os.path
 from abc import ABC, abstractmethod
 import pandas as pd
 
@@ -9,6 +10,8 @@ logger = Logger.__call__().get_logger()
 class BaseObjectHelper(ABC):
     def __init__(self, object_name: str, source_file_path: str):
         self._object_name = object_name
+        if not os.path.exists(source_file_path):
+            raise FileNotFoundError(f"Source path to {object_name} doesn't exists")
         self._source_file_path = source_file_path
 
     @property

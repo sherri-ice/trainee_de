@@ -1,5 +1,6 @@
 import os
 import re
+from collections import defaultdict
 
 
 class QueryManager:
@@ -8,12 +9,13 @@ class QueryManager:
         self._queries_dict = self._load_queries()
 
     def _load_queries(self):
-        query_dict = {}
+        query_dict = defaultdict(lambda: {})
         for query_type_dict in os.listdir(self._queries_dir): # check if sql
             cur_path = os.path.join(self._queries_dir, query_type_dict)
             for filename in os.listdir(cur_path):
                 with open(os.path.join(cur_path, filename), 'r') as file:
-                    query_dict[os.path.splitext(filename)[0]] = re.sub(' +', ' ', re.sub('\n', ' ', file.read()))
+                    query_dict[query_type_dict][os.path.splitext(filename)[0]] = \
+                        re.sub(' +', ' ', re.sub('\n', ' ', file.read()))
         return query_dict
 
     @property

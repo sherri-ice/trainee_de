@@ -37,11 +37,11 @@ def showcase(student_source_path: str, room_source_path: str, export_result_type
     room_helper = RoomHelper()
     room_helper.set_data_source(room_source_path)
 
-    etl = ETL([student_helper, room_helper])
+    etl = ETL(db_config_path="sql/configs/db_config.json", object_helpers=[student_helper, room_helper])
     etl.extract()
     etl.load()
 
-    etl.export_results(output_format=export_result_type)
+    etl.do_all_selects_and_export_results()
 
 
 if __name__ == "__main__":

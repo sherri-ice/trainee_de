@@ -1,9 +1,0 @@
-{
-  "db_host": "localhost",
-  "db_type": "mysql+pymysql",
-  "db_username": "user",
-  "db_password": "paword",
-  "db_name": "hostel",
-  "db_port": "3306"
-
-}
