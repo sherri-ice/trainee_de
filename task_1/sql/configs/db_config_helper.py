@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import json
 
 
 class DBConfigHelper:
-    def __init__(self, config_path: str = "sql/configs/db_config.json"):
-        with open(config_path, 'r') as config_file:
+    def __init__(self, config_path: str = 'sql/configs/db_config.json'):
+        with open(config_path) as config_file:
             config = json.load(config_file)
             self._db_host = config['db_host']
             self._db_type = config['db_type']
@@ -22,8 +24,5 @@ class DBConfigHelper:
             'database': self._db_name,
             'user': self._db_username,
             'password': self._db_password,
-            'port': self._db_port
+            'port': self._db_port,
         }
-
-
-

@@ -1,9 +1,9 @@
+from __future__ import annotations
+
 from json import JSONDecodeError
-
-import pytest
-
 from pathlib import Path
 
+import pytest
 from sqlalchemy.exc import DBAPIError
 
 from task_1.sql.configs.db_config_helper import DBConfigHelper
@@ -24,25 +24,29 @@ def change_test_dir(base_path: Path, monkeypatch):
 
 
 def test_can_parse_db_config():
-    config_helper = DBConfigHelper(config_path="fixtures/test_db_config.json")
+    DBConfigHelper(config_path='fixtures/test_db_config.json')
 
 
 def test_not_existing_db_config():
     with pytest.raises(FileNotFoundError):
-        config_helper = DBConfigHelper(config_path="fixtures/not_existing_path.json")
+        DBConfigHelper(config_path='fixtures/not_existing_path.json')
 
 
 def test_not_json_db_config():
     with pytest.raises(JSONDecodeError):
-        config_helper = DBConfigHelper(config_path="test_db/samples/not_json_db_config.txt")
+        DBConfigHelper(config_path='test_db/samples/not_json_db_config.txt')
 
 
 def test_can_instantiate_db_connection():
-    config_helper = DBConfigHelper(config_path="test_db/samples/db_config_test.json")
-    db = SqlConnector(config_helper.get_credentials())
+    config_helper = DBConfigHelper(
+        config_path='test_db/samples/db_config_test.json',
+    )
+    SqlConnector(config_helper.get_credentials())
 
 
 def test_wrong_db_credentials():
-    config_helper = DBConfigHelper(config_path="test_db/samples/db_wrong_config_test.json")
+    config_helper = DBConfigHelper(
+        config_path='test_db/samples/db_wrong_config_test.json',
+    )
     with pytest.raises(DBAPIError):
-        db = SqlConnector(config_helper.get_credentials())
+        SqlConnector(config_helper.get_credentials())

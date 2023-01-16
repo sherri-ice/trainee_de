@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 import pytest
@@ -17,10 +19,10 @@ def change_test_dir(base_path: Path, monkeypatch):
 
 
 def test_check_query_manager():
-    query_manager = QueryManager(queries_dir="fixtures/queries")
+    query_manager = QueryManager(queries_dir='fixtures/queries')
     assert len(query_manager.queries_dict) == 1
 
 
 def test_query_manager_with_not_existing_dir():
     with pytest.raises(FileNotFoundError):
-        QueryManager(queries_dir="fixtures/not_existing")
+        QueryManager(queries_dir='fixtures/not_existing')
