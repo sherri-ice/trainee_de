@@ -1,4 +1,4 @@
-# Data Engineer Internship Repositiry
+# Data Engineer Internship Repository
 
 Repositiry for internship tasks as Data Engineer intern at Innowise Group.
 
