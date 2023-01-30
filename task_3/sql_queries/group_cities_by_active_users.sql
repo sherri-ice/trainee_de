@@ -1,4 +1,4 @@
--- two ways to do this task, the comparison on performance is in task_3.md
+-- two ways to do this task, the comparison on performance is in task_3/readme.md
 
 /* SELECT temp.city,
        count(CASE WHEN customer.activebool = TRUE THEN 1 END)  AS active_population,

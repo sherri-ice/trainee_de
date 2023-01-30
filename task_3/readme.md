@@ -48,7 +48,7 @@ The execution time of this query:
 
 ![img.png](addition/temp_table_time.png)
 
-### Итог
+### Sum
 Obviously, a temporary table on this data worked faster, but in the general case, the use of temporary tables does not guarantee
 query execution is faster than sub queries and joins.
 
