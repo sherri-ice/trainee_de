@@ -1,18 +1,21 @@
-select
-    actor.first_name, actor.last_name, sum(actors.rental_duration) as rental_duration
-from
-(select
+SELECT
+    actor.first_name, actor.last_name, sum(actors.rental_duration) AS rental_duration
+FROM
+(SELECT
     film_actor.actor_id, film.rental_duration
-from
+FROM
     film
-join
-        film_actor on film_actor.film_id = film.film_id
-order by
-    film.rental_duration desc
-) as actors
-join
-    actor on actor.actor_id = actors.actor_id
-group by
+JOIN film_actor
+    ON film_actor.film_id = film.film_id
+ORDER BY
+    film.rental_duration
+    DESC
+) AS actors
+JOIN actor on
+    actor.actor_id = actors.actor_id
+GROUP BY
     actor.actor_id
-order by rental_duration desc
-limit 10;
+ORDER BY
+    rental_duration
+    DESC
+LIMIT 10;

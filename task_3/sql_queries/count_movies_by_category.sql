@@ -1,9 +1,10 @@
-select
+SElECT
     category.name, count(film_category.film_id) as films_number
-from
+FROM
     film_category
-join category on film_category.category_id = category.category_id
-group by
+JOIN category AS cat
+    ON film_category.category_id = cat.category_id
+GROUP BY
     category.name
-order by
-    films_number desc;
+ORDER BY
+    films_number DESC;

@@ -1,6 +1,6 @@
-select
+SELECT
     *
-from sales_by_film_category
-limit 1;
+FROM sales_by_film_category
+LIMIT 1;
 
-# todo: is it okay to use views from pagila?
+/* todo: is it okay to use views from pagila? */

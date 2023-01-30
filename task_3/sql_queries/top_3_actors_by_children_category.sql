@@ -1,22 +1,29 @@
-select
+SELECT
     film.film_id, film_category.category_id
-into children_movies
-from film
-join film_category on film.film_id = film_category.film_id
-where
-    film_category.category_id in
-    (select category_id
-     from category
-     where category.name like 'Children');
+INTO children_movies
+FROM film
+JOIN film_category
+    ON film.film_id = film_category.film_id
+WHERE
+    film_category.category_id IN
+    (SELECT category_id
+     FROM category
+     WHERE category.name LIKE 'Children');
 
-select
+SELECT
     actor.actor_id, actor.first_name, actor.last_name, temp.children_movies_count
-from (select film_actor.actor_id,
-             count(children_movies.film_id) as children_movies_count
-      from children_movies
-               join film_actor on film_actor.film_id = children_movies.film_id
-      group by film_actor.actor_id
-      order by children_movies_count desc
-      limit 10
-) as temp
-join actor on actor.actor_id = temp.actor_id;
+FROM
+    (SELECT film_actor.actor_id,
+             count(children_movies.film_id) AS children_movies_count
+      FROM children_movies
+               JOIN film_actor
+                   ON film_actor.film_id = children_movies.film_id
+      GROUP BY
+          film_actor.actor_id
+      ORDER BY
+          children_movies_count DESC
+      LIMIT
+          10
+) AS temp
+JOIN actor
+    ON actor.actor_id = temp.actor_id;
