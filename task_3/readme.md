@@ -1,11 +1,14 @@
 # Task 3. SQL queries.
 
-## 
+All SQL scripts are presented [sql_queries](sql_queries) folder. 
+Uses [pagila](https://github.com/devrimgunduz/pagila) For DBMS Postgresql is used, distrubed by docker container.
 
-## Task 6. Group cities by number of active and inactive customers
+## Perfomance notes
+
+### Task 6. Group cities by number of active and inactive customers
 The solution was implemented in two ways: subqueries and temporary tables.
 
-### Subquery and joins
+#### Subquery and joins
 ```sql 
 SELECT temp.city,
        count(CASE WHEN customer.activebool = TRUE THEN 1 END)  AS active_population,
@@ -26,7 +29,7 @@ The execution time of this query:
 ![img.png](addition/subquery_time.png)
 
 
-### Temp table
+#### Temp table
 
 ```sql
 WITH address_city AS (
