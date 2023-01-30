@@ -22,6 +22,7 @@ ORDER BY inactive_population DESC;
 ```
 
 The execution time of this query:
+
 ![img.png](addition/subquery_time.png)
 
 
