@@ -8,10 +8,10 @@ import pandas as pd
 import pytest
 import sqlalchemy
 
-from task_1.sql.configs.db_config_helper import DBConfigHelper
-from task_1.src.etl.etl import ETL
-from task_1.src.object_helper.room_helper import RoomHelper
-from task_1.src.object_helper.student_helper import StudentHelper
+from python.sql.configs.db_config_helper import DBConfigHelper
+from python.src.etl.etl import ETL
+from python.src.object_helper.room_helper import RoomHelper
+from python.src.object_helper.student_helper import StudentHelper
 
 
 @pytest.fixture
@@ -63,7 +63,7 @@ def etl_obj(mocker, db_connection):
             'foreign key (room) references hostel.Rooms(id) on delete cascade);',
         )
 
-    mocker.patch('task_1.src.etl.etl.ETL._prepare_database', prepare_database)
+    mocker.patch('python.src.etl.etl.ETL._prepare_database', prepare_database)
 
     rooms_helper = RoomHelper('fixtures/test_rooms.json')
     students_helper = StudentHelper('fixtures/test_students.json')

@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import CursorResult
 from sqlalchemy.exc import DBAPIError
 
-from task_1.logs.logger import Logger
+from python.logs.logger import Logger
 
 logger = Logger.__call__().get_logger()
 

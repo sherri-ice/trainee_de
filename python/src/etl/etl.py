@@ -5,10 +5,10 @@ import os
 import pandas as pd
 from object_helper.base_object_helper import BaseObjectHelper
 
-from task_1.logs.logger import Logger
-from task_1.sql.configs.db_config_helper import DBConfigHelper
-from task_1.sql.queries_manager.queries_manager import QueryManager
-from task_1.sql.sql_connector.sql_connector import SQLConnector
+from python.logs.logger import Logger
+from python.sql.configs.db_config_helper import DBConfigHelper
+from python.sql.queries_manager.queries_manager import QueryManager
+from python.sql.sql_connector.sql_connector import SQLConnector
 
 logger = Logger.__call__().get_logger()
 

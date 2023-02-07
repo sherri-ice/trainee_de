@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import argparse
 
-from task_1.logs.logger import Logger
-from task_1.src.etl.etl import ETL
-from task_1.src.object_helper.room_helper import RoomHelper
-from task_1.src.object_helper.student_helper import StudentHelper
+from python.logs.logger import Logger
+from python.src.etl.etl import ETL
+from python.src.object_helper.room_helper import RoomHelper
+from python.src.object_helper.student_helper import StudentHelper
 
 logger = Logger.__call__().get_logger()
 

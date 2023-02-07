@@ -6,7 +6,7 @@ from abc import abstractmethod
 
 import pandas as pd
 
-from task_1.logs.logger import Logger
+from python.logs.logger import Logger
 
 logger = Logger.__call__().get_logger()
 
