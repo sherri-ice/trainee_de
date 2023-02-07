@@ -53,10 +53,10 @@ plans = df_last._jdf.queryExecution().toString()
 
 plans_1 = df_last._sc._jvm.PythonSQLUtils.explainString(df_last._jdf.queryExecution(), 'EXTENDED')
 
-with open('plans.txt', 'w') as file:
+with open('execution_plans/plans.txt', 'w') as file:
     file.write(plans)
     
 #я оставил оба варианта вывода планов, но второй который plans_1 предпочтительнее. Планы одинаковые
 
-with open('plans1.txt', 'w') as file:
+with open('execution_plans/plans1.txt', 'w') as file:
     file.write(plans_1)
