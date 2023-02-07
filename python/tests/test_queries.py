@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from task_1.sql.queries_manager.queries_manager import QueryManager
+from python.sql.queries_manager.queries_manager import QueryManager
 
 
 @pytest.fixture

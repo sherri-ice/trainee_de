@@ -5,8 +5,8 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from task_1.src.object_helper.room_helper import RoomHelper
-from task_1.src.object_helper.student_helper import StudentHelper
+from python.src.object_helper.room_helper import RoomHelper
+from python.src.object_helper.student_helper import StudentHelper
 
 
 @pytest.fixture

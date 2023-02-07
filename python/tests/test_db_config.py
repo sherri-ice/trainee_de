@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 from sqlalchemy.exc import DBAPIError
 
-from task_1.sql.configs.db_config_helper import DBConfigHelper
-from task_1.sql.sql_connector.sql_connector import SQLConnector
+from python.sql.configs.db_config_helper import DBConfigHelper
+from python.sql.sql_connector.sql_connector import SQLConnector
 
 
 # todo: Group tests?
