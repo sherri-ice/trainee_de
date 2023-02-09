@@ -12,3 +12,5 @@ All tasks are divided by folders. Each folder contains it's own readme.md with t
 [30.01.2023] Task 3 (SQL Queries) completed.
 
 [08.02.2023] Task 4 (Spark Demo Course) completed.
+
+[09.02.2023] Task 5 (Spark Framework) completed.
