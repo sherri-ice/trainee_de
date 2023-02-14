@@ -5,8 +5,12 @@ from airflow.decorators import dag, task, task_group
 from airflow.sensors.filesystem import FileSensor
 from airflow.models import Variable
 
+default_args = {
+    'owner': 'sherri-ice'
+}
 
-@dag(schedule=None, start_date=datetime.utcnow(), catchup=False)
+
+@dag(default_args=default_args, schedule=None, start_date=datetime.utcnow(), catchup=False)
 def tasks_flow():
     @task
     def read_csv(file_path: str) -> pd.DataFrame:
