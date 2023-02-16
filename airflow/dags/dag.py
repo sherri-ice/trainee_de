@@ -43,7 +43,7 @@ def tasks_flow():
 
     @task
     def load_to_mongo(data: pd.DataFrame):
-        mongo_db_conn_str = 'mongodb://admin:password@localhost:27017'
+        mongo_db_conn_str = Variable.get('MONGO_CONN_STR')
         mongo_client = pymongo.MongoClient(mongo_db_conn_str)
         db = mongo_client['reviews']  # creates if not exists
         collection = db['tiktok']
