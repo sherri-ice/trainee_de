@@ -1,6 +1,6 @@
 # Airflow
 
-#.# Docker and Celery worker
+## Docker and Celery worker
 All Airflow daemons + Mongo DB daemon + Postgresql daemon and Celery worker are wrapped in container with [Docker](https://www.docker.com/).
 
 All declaration of Docker containers are described in [docker-compose.yaml](docker-compose.yaml).
