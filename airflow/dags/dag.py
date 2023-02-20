@@ -47,7 +47,7 @@ def tasks_flow():
         mongo_client = pymongo.MongoClient(mongo_db_conn_str)
         db = mongo_client['reviews']  # creates if not exists
         collection = db['tiktok']
-        collection.update_many(data.to_dict(orient='records'), upsert=True)
+        collection.insert_many(data.to_dict(orient='records'))
 
     data_path = Variable.get('DATA_PATH')
 
