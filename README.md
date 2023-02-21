@@ -14,3 +14,8 @@ All tasks are divided by folders. Each folder contains it's own readme.md with t
 [08.02.2023] Task 4 (Spark Demo Course) completed.
 
 [09.02.2023] Task 5 (Spark Framework) completed.
+
+[13.02.2023] Task 6 (Airflow Demo Course) completed.
+
+[21.02.2023] Task 7 (Airflow) completed.
+
