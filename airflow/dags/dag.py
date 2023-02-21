@@ -47,10 +47,7 @@ def tasks_flow():
         mongo_client = pymongo.MongoClient(mongo_db_conn_str)
         db = mongo_client['reviews']  # creates if not exists
         collection = db['tiktok']
-        # todo: I guess I supposed to use upsert here instead of dropping collection
         collection.drop()
-        # collection.create_index([('reviewId', pymongo.ASCENDING)], unique=True)
-        # collection.update_many(data.to_dict(orient='records'), upsert=True)
         collection.insert_many(data.to_dict(orient='records'))
 
     data_path = Variable.get('DATA_PATH')
