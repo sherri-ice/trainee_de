@@ -1,0 +1,150 @@
+version: '3.8'
+
+x-airflow-common:
+  &airflow-common
+  build: .
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./data:/opt/airflow/data
+#  volumes:
+#    - type: bind
+#      source: ./dags
+#      target: /opt/airflow/dags
+#
+#    - type: bind
+#      source: ./data
+#      target: /opt/airflow/data
+
+  environment:
+    &airflow-common-env
+#    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+#    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+#    AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'false'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__CORE__ENABLE_XCOM_PICKLING: 'true' # for json reading
+    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
+    AIRFLOW_VAR_DATA_PATH: '/opt/airflow/data/tiktok_google_play_reviews.csv'
+    AIRFLOW_CONN_MONGO_DEFAULT: 'mongo://admin:password@mongodb.example.com:27017/%3FauthSource%3Dadmin'
+#    &airflow-common-env
+##    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+##    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+##    AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+#
+#    # For common postgresql table
+#    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+#
+#    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'false'
+#    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+#    AIRFLOW__CORE__ENABLE_XCOM_PICKLING: 'true' # for json reading
+#    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
+#
+#    AIRFLOW_CONN_MONGO_DEFAULT: mongo://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_PORT}/%3FauthSource%3Dadmin
+#
+#    AIRFLOW_VAR_DATA_PATH: /opt/airflow/data/${DATASET_NAME}
+#    AIRFLOW_VAR_MONGO_CONN_STR: mongo://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_PORT}/%3FauthSource%3Dadmin
+
+  depends_on:
+    &airflow-common-depends-on
+#    redis:
+#      condition: service_healthy
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "airflow" ]
+      interval: 5s
+      retries: 5
+    restart: always
+
+#  redis:
+#      image: redis:latest
+#      ports:
+#        - "6379:6379"
+#      healthcheck:
+#        test: [ "CMD", "redis-cli", "ping" ]
+#        interval: 5s
+#        timeout: 30s
+#        retries: 50
+#      restart: always
+
+#  airflow-init:
+#    <<: *airflow-common
+#    entrypoint: /bin/bash
+#    command: -c " mkdir -p /sources/logs /sources/dags && airflow db init"
+#    environment:
+#      <<: *airflow-common-env
+#      # Create airflow user
+#      _AIRFLOW_DB_UPGRADE: 'true'
+#      _AIRFLOW_WWW_USER_CREATE: 'true'
+#      _AIRFLOW_WWW_USER_USERNAME: airflow
+#      _AIRFLOW_WWW_USER_PASSWORD: airflow
+#    volumes:
+#      - .:/sources
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        mkdir -p /sources/logs /sources/dags
+        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags}
+        exec /entrypoint airflow db init
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_UPGRADE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: airflow
+      _AIRFLOW_WWW_USER_PASSWORD: airflow
+      _PIP_ADDITIONAL_REQUIREMENTS: ''
+    user: "0:0"
+    volumes:
+      - ${AIRFLOW_PROJ_DIR:-.}:/sources
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    environment:
+      <<: *airflow-common-env
+    depends_on:
+        <<: *airflow-common-depends-on
+        airflow-init:
+          condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    environment:
+      <<: *airflow-common-env
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  mongodb:
+    image: mongo:latest
+    volumes:
+      - mongo-db-volume:/data/db
+    ports:
+      - ${MONGODB_PORT}:${MONGODB_PORT}
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+
+volumes:
+  postgres-db-volume:
+  mongo-db-volume:
+
