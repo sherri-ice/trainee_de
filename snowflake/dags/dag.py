@@ -19,7 +19,9 @@ default_args = {
 def tasks_flow():
     @task
     def read_csv(file_path: str) -> pd.DataFrame:
-        return pd.read_csv(file_path)
+        data = pd.read_csv(file_path, index_col=False)
+        data.columns = data.columns.str.upper()
+        return data
 
     @task_group
     def prepare_snowflake_database_group(snowflake_cursor: SnowflakeCursor):
@@ -59,7 +61,7 @@ def tasks_flow():
             snowflake_connection.cursor().execute(f'INSERT INTO MASTER_TABLE SELECT * FROM STAGE_TABLE')
 
         load_data_from_pandas_to_raw_table(data, 'RAW_TABLE', snowflake_connection) >> \
-        load_data_from_raw_to_stage >> load_data_from_stage_to_master
+        load_data_from_raw_to_stage() >> load_data_from_stage_to_master()
 
     # Snowflake setup
     snowflake_user = Variable.get('SNOWFLAKE_USER')
