@@ -4,13 +4,13 @@ import json
 
 
 class DBConfigHelper:
-    def __init__(self, config_path: str = 'sql/configs/db_config.json'):
+    def __init__(self, config_path: str = 'sql_helper/configs/db_config.json'):
         """
         DBCongigHelper helps to load databases configuration from JSON files.
 
 
         :param self: Reference the current instance of the class
-        :param config_path:str='sql/configs/db_config.json': Specify the path to the database configuration file
+        :param config_path:str='sql_helper/configs/db_config.json': Specify the path to the database configuration file
         :return: None
         """
         with open(config_path) as config_file:

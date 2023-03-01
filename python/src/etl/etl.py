@@ -69,7 +69,7 @@ class ETL:
 
     def do_select_query(self, query_name: str) -> pd.DataFrame:
         """
-        The do_select_query function is used to execute a select query from the queries.sql file.
+        The do_select_query function is used to execute a select query from the queries.sql_helper file.
         The function takes in a string as an argument, which is the name of the query you want to run.
         It returns a pandas dataframe containing all of your results.
 
@@ -84,7 +84,7 @@ class ETL:
         The export_results function exports the results of a query to a specified format.
         The function takes two arguments:
             - query_name: The name of the SQL query to be executed. This is used as an identifier for the output file,
-            and should correspond with one of the queries defined in `sql/sql_queries/selects`
+            and should correspond with one of the queries defined in `sql_helper/sql_queries/selects`
             - output_format: The format in which you want your results exported. Currently supported formats are 'json'
             and 'xml'. Defaults to json if not specified.
 
@@ -130,7 +130,7 @@ class ETL:
     def do_all_selects_and_export_results(self, output_format: str = 'json'):
         """
         The do_all_selects_and_export_results function loops through all the select functions in the
-        sql/sql_queries/selects directory, and executes them and exports their results to a JSON or xml file depending
+        sql_helper/sql_queries/selects directory, and executes them and exports their results to a JSON or xml file depending
         on what output_format is set to.
 
         :param self: Access the class attributes
