@@ -9,8 +9,8 @@ services:
       POSTGRES_PASSWORD: 123456
       POSTGRES_USER: postgres
     volumes:
-      - ./pagila-schema.sql:/docker-entrypoint-initdb.d/1-pagila-schema.sql
-      - ./pagila-data.sql:/docker-entrypoint-initdb.d/2-pagila-data.sql
+      - ./pagila-schema.sql_helper:/docker-entrypoint-initdb.d/1-pagila-schema.sql_helper
+      - ./pagila-data.sql_helper:/docker-entrypoint-initdb.d/2-pagila-data.sql_helper
       - pgdata:/var/lib/postgresql/data
       - ../sql_queries:/var/queries
     expose:

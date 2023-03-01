@@ -57,7 +57,7 @@ class SQLConnector:
         It returns the result of the query.
 
         :param self: Access the class attributes and methods
-        :param query:str: Pass a sql query to the execute_query function
+        :param query:str: Pass a sql_helper query to the execute_query function
         :return: The result of the query
         """
         return self.__engine_connect__.execute(query)

@@ -6,13 +6,13 @@ from collections import defaultdict
 
 
 class QueryManager:
-    def __init__(self, queries_dir: str = 'sql/sql_queries'):
+    def __init__(self, queries_dir: str = 'sql_helper/sql_queries'):
         """
         QueryManager parses and stores SQL queries from queries_dir folder.
-        All SQL queries must be written in .sql files.
+        All SQL queries must be written in .sql_helper files.
 
         :param self: Refer to the object instance from inside the class
-        :param queries_dir:str='sql/sql_queries': Tell the class where to look for the queries
+        :param queries_dir:str='sql_helper/sql_queries': Tell the class where to look for the queries
         :return: None
         """
         self._queries_dir = os.path.join(os.getcwd(), queries_dir)
@@ -28,7 +28,7 @@ class QueryManager:
         :return: A dictionary of dictionaries of queries
         """
         query_dict: dict[str, dict[str, str]] = defaultdict(lambda: {})
-        for query_type_dict in os.listdir(self._queries_dir):  # check if sql
+        for query_type_dict in os.listdir(self._queries_dir):  # check if sql_helper
             cur_path = os.path.join(self._queries_dir, query_type_dict)
             for filename in os.listdir(cur_path):
                 with open(os.path.join(cur_path, filename)) as file:

@@ -10,10 +10,10 @@ services:
     volumes:
       - type: bind
         source: ${PROJECT_HOME}/${SCHEMA_SCRIPT_PATH}
-        target: ${ENTRYPOINT_DIRECTORY_PATH}/1-pagila-schema.sql
+        target: ${ENTRYPOINT_DIRECTORY_PATH}/1-pagila-schema.sql_helper
       - type: bind
         source:  ${PROJECT_HOME}/${DATA_SCRIPT_PATH}
-        target: ${ENTRYPOINT_DIRECTORY_PATH}/2-pagila-data.sql
+        target: ${ENTRYPOINT_DIRECTORY_PATH}/2-pagila-data.sql_helper
     ports:
       - ${HOST_PORT}:${CONTAINER_PORT}
     expose:
