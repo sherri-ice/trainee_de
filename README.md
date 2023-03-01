@@ -19,3 +19,5 @@ All tasks are divided by folders. Each folder contains it's own readme.md with t
 
 [21.02.2023] Task 7 (Airflow) completed.
 
+[01.03.2023] Task 8 (Snowflake) completed.
+
