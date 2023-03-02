@@ -1,0 +1,28 @@
+import os
+from datetime import datetime, timedelta
+
+import pandas as pd
+from airflow.decorators import dag, task, task_group
+from airflow.models import Variable
+
+from email_storage import EmailStorage
+
+default_args = {
+    'owner': 'sherri-ice',
+    'email': EmailStorage(os.getenv('EMAIL_CONFIG_PATH')).email_list,
+    'email_on_failure': 'True',
+}
+
+
+@dag(dag_id='process_mobile_logs', default_args=default_args, schedule=timedelta(minutes=10),
+     start_date=datetime.utcnow(), catchup=False)
+def process_mobile_logs():
+    @task
+    def read_logs_from_csv(log_csv_path: str) -> pd.DataFrame:
+        return pd.read_csv(log_csv_path)
+
+    data_path = Variable.get('DATA_PATH')
+    read_logs_from_csv(data_path)
+
+
+process_mobile_logs()
