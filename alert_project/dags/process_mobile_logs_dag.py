@@ -5,6 +5,7 @@ from typing import List
 import pandas as pd
 from airflow.decorators import dag, task, task_group
 from airflow.models import Variable
+from airflow.sensors.filesystem import FileSensor
 
 from config_storage import EmailStorage, SchemaStorage
 
@@ -27,14 +28,15 @@ def process_mobile_logs():
         @task
         def rename_df_columns(df: pd.DataFrame, new_column_names: List[str]) -> pd.DataFrame:
             df.columns = new_column_names
-            df['date'] = pd.to_datetime(df['date'])
+            df['date'] = pd.to_datetime(df['date'], unit='s')
             return df
 
         data_path = Variable.get('DATA_PATH')
         schema_config_path = Variable.get('SCHEMA_CONFIG_PATH')
         new_column_names = SchemaStorage(schema_config_path).schema_config
 
-        data = read_logs_from_csv(data_path)
+        file_wait_sensor = FileSensor(task_id='waiting_for_log_journal', filepath=data_path)
+        data = file_wait_sensor >> read_logs_from_csv(data_path)
         rename_df_columns(data, new_column_names)
 
     prepare_logs()
