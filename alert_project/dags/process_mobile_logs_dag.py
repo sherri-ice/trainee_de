@@ -27,6 +27,7 @@ def process_mobile_logs():
         @task
         def rename_df_columns(df: pd.DataFrame, new_column_names: List[str]) -> pd.DataFrame:
             df.columns = new_column_names
+            df['date'] = pd.to_datetime(df['date'])
             return df
 
         data_path = Variable.get('DATA_PATH')
