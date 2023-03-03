@@ -23,6 +23,7 @@ x-airflow-common:
 
     # User-defined variables for airflow
     AIRFLOW_VAR_DATA_PATH: ${AIRFLOW_PATH}/${DATA_PATH}
+    AIRFLOW_VAR_SCHEMA_CONFIG_PATH: ${SCHEMA_CONFIG_PATH}
 
     # Variables for email messaging
     EMAIL_CONFIG_PATH: ${EMAIL_CONFIG_PATH}
@@ -32,6 +33,7 @@ x-airflow-common:
     - ./dags:${AIRFLOW_PATH}/dags
     - ./data:${AIRFLOW_PATH}/data
     - ./configs:${AIRFLOW_PATH}/configs
+    - ./schema:${AIRFLOW_PATH}/schema
 
   user: ${AIRFLOW_UID}:${AIRFLOW_GID}
 
