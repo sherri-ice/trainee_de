@@ -19,10 +19,9 @@ if __name__ == "__main__":
     minutes_window = from_unixtime(col('date') - col('date') % minutes_in_seconds)
     df = df.withColumn('minute_window', minutes_window)
 
-    df = df.filter(col('severity') == 'Error')\
-        .groupby('minute_window')\
-        .agg(count('error_code').alias('count_of_errors'))\
+    df = df.filter(col('severity') == 'Error') \
+        .groupby('minute_window') \
+        .agg(count('error_code').alias('count_of_errors')) \
         .filter(col('count_of_errors') >= 10)
 
     df.write.format('csv').options(header=True).save('data/failed_minutes_data.csv')
-

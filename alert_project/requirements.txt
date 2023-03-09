@@ -1,4 +1,0 @@
-pandas
-pymongo==4.3.3
-apache-airflow-providers-mongo
-apache-airflow-providers-redis

@@ -23,19 +23,20 @@ x-airflow-common:
 
     # User-defined variables for airflow
     AIRFLOW_VAR_DATA_PATH: ${AIRFLOW_PATH}/${DATA_PATH}
-    AIRFLOW_VAR_SCHEMA_CONFIG_PATH: ${SCHEMA_CONFIG_PATH}
 
     # Variables for email messaging
     EMAIL_CONFIG_PATH: ${EMAIL_CONFIG_PATH}
 
-
   volumes:
-    - ./dags:${AIRFLOW_PATH}/dags
-    - ./data:${AIRFLOW_PATH}/data
-    - ./configs:${AIRFLOW_PATH}/configs
-    - ./schema:${AIRFLOW_PATH}/schema
+    - ../dags:${AIRFLOW_PATH}/dags
+    - ../data:${AIRFLOW_PATH}/data
+    - ../configs:${AIRFLOW_PATH}/configs
+    - ../schema:${AIRFLOW_PATH}/schema
+    - ../spark/app:/usr/local/spark/app
 
   user: ${AIRFLOW_UID}:${AIRFLOW_GID}
+  networks:
+    - default_net
 
   depends_on:
     &airflow-common-depends-on
@@ -47,6 +48,8 @@ x-airflow-common:
 services:
   postgres:
     image: postgres:13
+    networks:
+      - default_net
     environment:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
@@ -61,6 +64,8 @@ services:
 
   redis:
     image: redis:latest
+    networks:
+      - default_net
     expose:
       - 6379
     healthcheck:
@@ -73,6 +78,8 @@ services:
   airflow-init:
     <<: *airflow-common
     entrypoint: /bin/bash
+    networks:
+      - default_net
     command:
       - -c
       - |
@@ -90,6 +97,8 @@ services:
   airflow-worker:
     <<: *airflow-common
     command: celery worker
+    networks:
+      - default_net
     healthcheck:
       test:
         - "CMD-SHELL"
@@ -109,6 +118,8 @@ services:
 
   airflow-scheduler:
     <<: *airflow-common
+    networks:
+      - default_net
     command: scheduler
     environment:
       <<: *airflow-common-env
@@ -120,9 +131,11 @@ services:
 
   airflow-webserver:
     <<: *airflow-common
-    command: webserver
+    networks:
+      - default_net
+    command: webserver --port=8484
     ports:
-      - "8080:8080"
+      - "8484:8484"
     environment:
       <<: *airflow-common-env
     depends_on:
@@ -130,6 +143,60 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  spark:
+    image: bitnami/spark:3.1.2
+    user: root
+    hostname: spark
+    networks:
+      - default_net
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    volumes:
+      - ../spark/app:/usr/local/spark/app
+    ports:
+      - "8383:8282"
+      - "7077:7077"
+
+  spark-worker-1:
+    image: bitnami/spark:3.1.2
+    user: root
+    networks:
+      - default_net
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=1
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    volumes:
+      - ../spark/app:/usr/local/spark/app
+
+  spark-worker-2:
+    image: bitnami/spark:3.1.2
+    user: root
+    networks:
+      - default_net
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=1
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    volumes:
+      - ../spark/app:/usr/local/spark/app
 
 volumes:
   postgres-db-volume:
+
+networks:
+  default_net:
