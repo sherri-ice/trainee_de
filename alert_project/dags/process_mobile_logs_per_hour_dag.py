@@ -17,7 +17,7 @@ default_args = {
 }
 
 
-@dag(dag_id='process_mobile_logs_per_one_minute', default_args=default_args, schedule=timedelta(minutes=10),
+@dag(dag_id='process_mobile_logs_per_one_hour', default_args=default_args, schedule=timedelta(minutes=10),
      start_date=datetime.utcnow(), catchup=False)
 def process_mobile_logs():
     # File sensor environment
@@ -31,8 +31,8 @@ def process_mobile_logs():
         task_id='load_and_group_error_logs_by_one_minute',
         application_args=[
             "data/data.csv",  # path for logs
-            "60",  # time to group logs in seconds
-            "all"  # select all bundle_id
+            f"{60 * 60}",  # time to group logs in seconds
+            "1"  # put exact bundle_id here
         ]
     )
 
