@@ -21,3 +21,4 @@ All tasks are divided by folders. Each folder contains it's own readme.md with t
 
 [01.03.2023] Task 8 (Snowflake) completed.
 
+[14.03.2023] Task 9 (Alert project) completed.
