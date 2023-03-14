@@ -1,12 +1,9 @@
 FROM apache/airflow:latest-python3.9
 
 USER root
-RUN #useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u 1001 airflow
-###############################
-## Begin JAVA installation
-###############################
-# Java is required in order to spark-submit work
-# Install OpenJDK-8
+
+# Install java for spark-submit option
+
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
     apt-get install -y procps &&  \
@@ -22,9 +19,7 @@ RUN apt-get update && \
 # Setup JAVA_HOME
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 RUN export JAVA_HOME
-###############################
-## Finish JAVA installation
-###############################
+
 
 USER airflow
 

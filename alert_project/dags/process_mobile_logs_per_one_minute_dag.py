@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 
 import pandas as pd
@@ -16,16 +17,23 @@ default_args = {
 }
 
 
-@dag(dag_id='process_mobile_logs', default_args=default_args, schedule=timedelta(minutes=10),
+@dag(dag_id='process_mobile_logs_per_one_minute', default_args=default_args, schedule=timedelta(minutes=10),
      start_date=datetime.utcnow(), catchup=False)
 def process_mobile_logs():
+    # File sensor environment
     data_path = Variable.get('DATA_PATH')
     file_wait_sensor = FileSensor(task_id='waiting_for_log_journal', filepath=data_path)
 
+    # Spark ETL process environment
+    spark_scripts_path = Variable.get("SPARK_SCRIPTS_PATH")
     etl_process = SparkSubmitOperator(
-        application='/opt/spark/app/etl_mobile_log_script.py',
-        task_id='load_logs_and_analyze_mobile_logs'
+        application=f'{spark_scripts_path}/load_and_group_error_logs_by_one_minute.py',
+        task_id='load_and_group_error_logs_by_one_minute'
     )
+
+    # Email notification task environment
+    failed_logs_path = Variable.get('FAILED_LOGS_PATH')
+    emails_to_notify = EmailStorage(Variable.get('EMAIL_CONFIG_PATH')).email_list
 
     @task
     def notify_on_failed_logs(failed_logs_path: str):
@@ -37,14 +45,13 @@ def process_mobile_logs():
         failed_log_df = pd.read_csv(failed_log_file)
         email = EmailOperator(
             task_id="send_emails_on_failed_logs",
-            to=EmailStorage(Variable.get('EMAIL_CONFIG_PATH')).email_list,
+            to=emails_to_notify,
             subject="",
             html_content=failed_log_df.to_html(),
             dag=context.get('dag')
         )
         email.execute(context=context)
-
-    failed_logs_path = Variable.get('FAILED_LOGS_PATH')
+        os.remove(failed_logs_path)
 
     file_wait_sensor >> etl_process >> notify_on_failed_logs(failed_logs_path)
 

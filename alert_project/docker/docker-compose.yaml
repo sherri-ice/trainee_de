@@ -6,16 +6,16 @@ x-airflow-common:
   user: ${AIRFLOW_UID}:${AIRFLOW_GID}
   environment:
     &airflow-common-env
-    # todo: add spark connection
-
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-    # Celery
+
+    # Celery executor
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
 
+    # Backend flask settings
     AIRFLOW__CORE__FERNET_KEY: ''
-    AIRFLOW__WEBSERVER__SECRET_KEY: 'secret'
+    AIRFLOW__WEBSERVER__SECRET_KEY: 'secret' # should be really random, though it's not production code :)
 
     # Core
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'false'
@@ -23,7 +23,10 @@ x-airflow-common:
     AIRFLOW__CORE__ENABLE_XCOM_PICKLING: 'true' # for json reading
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
 
-    # Email config
+    # Spark connection
+    AIRFLOW_CONN_SPARK_DEFAULT: 'spark://spark:7077'
+
+    # Email config for alerts
     AIRFLOW__SMTP__SMTP_HOST: "smtp.gmail.com"
     AIRFLOW__SMTP__SMTP_STARTTLS: 'true'
     AIRFLOW__SMTP__SMTP_SSL: 'false'
@@ -31,18 +34,18 @@ x-airflow-common:
     AIRFLOW__SMTP__SMTP_PASSWORD: ${GMAIL_PASSWORD_CODE}
     AIRFLOW__SMTP__SMTP_PORT: 587
     AIRFLOW__SMTP__SMTP_MAIL_FROM: ${GMAIL_EMAIL}
+    AIRFLOW_VAR_EMAIL_CONFIG_PATH: ${EMAIL_CONFIG_PATH} # list of email recipients
 
-    # User-defined variables for airflow
+    # Define paths for data
     AIRFLOW_VAR_DATA_PATH: ${AIRFLOW_BASE_PATH}/${DATA_PATH}
     AIRFLOW_VAR_FAILED_LOGS_PATH: ${AIRFLOW_BASE_PATH}/${FAILED_LOGS_PATH}
 
-    # Variables for email messaging
-    AIRFLOW_VAR_EMAIL_CONFIG_PATH: ${EMAIL_CONFIG_PATH}
-
+    # Spark scripts path
+    AIRFLOW_VAR_SPARK_SCRIPTS_PATH: ${SPARK_BASE_PATH}/app/
 
   volumes:
     - ../dags:${AIRFLOW_BASE_PATH}/dags
-    - ../data:${AIRFLOW_BASE_PATH}/data:z
+    - ../data:${AIRFLOW_BASE_PATH}/data:z # z stands for shared folder between many containers. See SELinux docs.
     - ../configs:${AIRFLOW_BASE_PATH}/configs
     - ../spark/app:${SPARK_BASE_PATH}/app
     - ../spark/resources:${SPARK_BASE_PATH}/resources
