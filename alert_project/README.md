@@ -16,7 +16,7 @@ Currently, this project supports two filter options:
 
 DAG:
 
-![img.png](img.png)
+![img.png](images/img.png)
 
 ## Setting up email
 First, we need to set up the SMTP configuration to send email from airflow. I consider using Gmail to set up the SMTP user and password in this session.
