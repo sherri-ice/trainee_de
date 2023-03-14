@@ -17,18 +17,30 @@ default_args = {
 }
 
 
-@dag(dag_id='process_mobile_logs_per_one_hour', default_args=default_args, schedule=timedelta(minutes=10),
+@dag(dag_id='process_mobile_logs', default_args=default_args, schedule=timedelta(minutes=10),
      start_date=datetime.utcnow(), catchup=False)
 def process_mobile_logs():
     # File sensor environment
     data_path = Variable.get('DATA_PATH')
     file_wait_sensor = FileSensor(task_id='waiting_for_log_journal', filepath=data_path)
 
-    # Spark ETL process environment
+    # Spark ETL per minute process environment
     spark_scripts_path = Variable.get("SPARK_SCRIPTS_PATH")
-    etl_process = SparkSubmitOperator(
+    etl_process_per_minute = SparkSubmitOperator(
         application=f'{spark_scripts_path}/load_and_group_error_logs_by_condition.py',
         task_id='load_and_group_error_logs_by_one_minute',
+        application_args=[
+            "data/data.csv",  # path for logs
+            "60",  # time to group logs in seconds
+            "all"  # select all bundle_id
+        ]
+    )
+
+    # Spark ETL per hour and bundle_id process environment
+    spark_scripts_path = Variable.get("SPARK_SCRIPTS_PATH")
+    etl_process_per_hour = SparkSubmitOperator(
+        application=f'{spark_scripts_path}/load_and_group_error_logs_by_condition.py',
+        task_id='load_and_group_error_logs_by_one_hour',
         application_args=[
             "data/data.csv",  # path for logs
             f"{60 * 60}",  # time to group logs in seconds
@@ -58,7 +70,7 @@ def process_mobile_logs():
         email.execute(context=context)
         os.remove(failed_logs_path)
 
-    file_wait_sensor >> etl_process >> notify_on_failed_logs(failed_logs_path)
+    file_wait_sensor >> [etl_process_per_minute, etl_process_per_hour] >> notify_on_failed_logs(failed_logs_path)
 
 
 process_mobile_logs()
