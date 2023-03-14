@@ -44,7 +44,7 @@ def process_mobile_logs():
         )
         email.execute(context=context)
 
-    failed_logs_path = ""
+    failed_logs_path = Variable.get('FAILED_LOGS_PATH')
 
     file_wait_sensor >> etl_process >> notify_on_failed_logs(failed_logs_path)
 

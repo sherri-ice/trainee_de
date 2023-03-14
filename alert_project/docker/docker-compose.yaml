@@ -3,9 +3,10 @@ version: '3.8'
 x-airflow-common:
   &airflow-common
   image: sherri-ice/airflow
-  user: "1000:1000"
+  user: ${AIRFLOW_UID}:${AIRFLOW_GID}
   environment:
     &airflow-common-env
+    # todo: add spark connection
 
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     # Celery
@@ -22,11 +23,21 @@ x-airflow-common:
     AIRFLOW__CORE__ENABLE_XCOM_PICKLING: 'true' # for json reading
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
 
+    # Email config
+    AIRFLOW__SMTP__SMTP_HOST: "smtp.gmail.com"
+    AIRFLOW__SMTP__SMTP_STARTTLS: 'true'
+    AIRFLOW__SMTP__SMTP_SSL: 'false'
+    AIRFLOW__SMTP__SMTP_USER: ${GMAIL_EMAIL}
+    AIRFLOW__SMTP__SMTP_PASSWORD: ${GMAIL_PASSWORD_CODE}
+    AIRFLOW__SMTP__SMTP_PORT: 587
+    AIRFLOW__SMTP__SMTP_MAIL_FROM: ${GMAIL_EMAIL}
+
     # User-defined variables for airflow
     AIRFLOW_VAR_DATA_PATH: ${AIRFLOW_BASE_PATH}/${DATA_PATH}
+    AIRFLOW_VAR_FAILED_LOGS_PATH: ${AIRFLOW_BASE_PATH}/${FAILED_LOGS_PATH}
 
     # Variables for email messaging
-    EMAIL_CONFIG_PATH: ${EMAIL_CONFIG_PATH}
+    AIRFLOW_VAR_EMAIL_CONFIG_PATH: ${EMAIL_CONFIG_PATH}
 
 
   volumes:
