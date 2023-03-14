@@ -23,7 +23,7 @@ def process_mobile_logs():
     file_wait_sensor = FileSensor(task_id='waiting_for_log_journal', filepath=data_path)
 
     etl_process = SparkSubmitOperator(
-        application='spark/etl_mobile_log_script.py',
+        application='/opt/spark/app/etl_mobile_log_script.py',
         task_id='load_logs_and_analyze_mobile_logs'
     )
 
@@ -44,7 +44,7 @@ def process_mobile_logs():
         )
         email.execute(context=context)
 
-    failed_logs_path = Variable.get("FAILED_LOGS_PATH")
+    failed_logs_path = ""
 
     file_wait_sensor >> etl_process >> notify_on_failed_logs(failed_logs_path)
 

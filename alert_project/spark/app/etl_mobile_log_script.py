@@ -2,8 +2,10 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, from_unixtime, count
 
 if __name__ == "__main__":
-    app_name = 'DataEngineering'
-    spark = SparkSession.builder.appName("Mobile Logs ETL").getOrCreate()
+    spark = SparkSession \
+        .builder \
+        .appName("Mobile Logs ETL") \
+        .master("local").getOrCreate()
 
     # Rename columns
     new_columns = ["error_code", "error_message", "severity", "log_location",
@@ -24,4 +26,4 @@ if __name__ == "__main__":
         .agg(count('error_code').alias('count_of_errors')) \
         .filter(col('count_of_errors') >= 10)
 
-    df.write.format('csv').options(header=True).save('data/failed_minutes_data.csv')
+    df.toPandas().to_csv('data/failed_minutes_data.csv')
