@@ -24,6 +24,10 @@ For generating password and setting up Gmail account check [this link](https://n
 
 Don't forget to write down your credentials in .env file. Use [example.env](docker%2Fexample.env).
 
+## Defining recipients emails
+Example of email config presented at [email_config_example.json](configs%2Femail_config_example.json).
+I implemented `EmailStorage` class, which just parses json.
+
 # Start with Docker
 First of all, build all images:
 
