@@ -5,7 +5,7 @@ import pandas as pd
 from dotenv import load_dotenv
 
 # todo: remove after dockerization
-load_dotenv("../.env")
+load_dotenv("../docker/.env")
 
 logging.basicConfig(level=logging.INFO)
 

@@ -17,8 +17,8 @@ provider "aws" {
   }
 }
 
-resource "aws_s3_bucket" "test-bucket" {
-  bucket = "my-bucket"
+resource "aws_s3_bucket" "helsinki-city-bikes-bucket" {
+  bucket = "helsinki-city-bikes"
 }
 
 resource "aws_iam_role" "invocation_role" {

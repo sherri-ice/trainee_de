@@ -23,22 +23,17 @@ x-airflow-common:
     AIRFLOW__CORE__ENABLE_XCOM_PICKLING: 'true' # for json reading
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
 
-    # Spark connection
+    # Custom connections
     AIRFLOW_CONN_SPARK_DEFAULT: 'spark://spark:7077'
-
-    # Email config for alerts
-    AIRFLOW__SMTP__SMTP_HOST: "smtp.gmail.com"
-    AIRFLOW__SMTP__SMTP_STARTTLS: 'true'
-    AIRFLOW__SMTP__SMTP_SSL: 'false'
-    AIRFLOW__SMTP__SMTP_USER: ${GMAIL_EMAIL}
-    AIRFLOW__SMTP__SMTP_PASSWORD: ${GMAIL_PASSWORD_CODE}
-    AIRFLOW__SMTP__SMTP_PORT: 587
-    AIRFLOW__SMTP__SMTP_MAIL_FROM: ${GMAIL_EMAIL}
-    AIRFLOW_VAR_EMAIL_CONFIG_PATH: ${EMAIL_CONFIG_PATH} # list of email recipients
+    # todo: вынести в переменные
+    AIRFLOW_CONN_AWS_DEFAULT: 'aws://test:test@/?endpoint_url=http://localstack:4566&region_name=eu-north-1'
 
     # Define paths for data
-    AIRFLOW_VAR_DATA_PATH: ${AIRFLOW_BASE_PATH}/${DATA_PATH}
-    AIRFLOW_VAR_FAILED_LOGS_PATH: ${AIRFLOW_BASE_PATH}/${FAILED_LOGS_PATH}
+    AIRFLOW_VAR_DATA_PATH: ${AIRFLOW_BASE_PATH}/${DATASET_PATH}
+    AIRFLOW_VAR_SPLIT_CSV_DIR: ${SPLIT_CSV_DIR}
+
+    # S3 variables
+    AIRFLOW_VAR_S3_BUCKET_NAME: ${S3_BUCKET_NAME}
 
     # Spark scripts path
     AIRFLOW_VAR_SPARK_SCRIPTS_PATH: ${SPARK_BASE_PATH}/app/
@@ -60,8 +55,10 @@ x-airflow-common:
       condition: service_healthy
 
 x-spark-common:
-  &spark-common:
+  &spark-common
   image: sherri-ice/postgres-spark
+  networks:
+    - default_net
   environment:
     - SPARK_MODE=worker
     - SPARK_MASTER_URL=spark://spark:7077
@@ -72,7 +69,6 @@ x-spark-common:
     - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
     - SPARK_SSL_ENABLED=no
   volumes:
-    - ../spark/resources:${SPARK_BASE_PATH}/resources/
     - ../spark/app:${SPARK_BASE_PATH}/app
 
 services:
@@ -109,8 +105,6 @@ services:
   airflow-init:
     <<: *airflow-common
     entrypoint: /bin/bash
-    networks:
-      - default_net
     command:
       - -c
       - |
@@ -128,8 +122,6 @@ services:
   airflow-worker:
     <<: *airflow-common
     command: celery worker
-    networks:
-      - default_net
     healthcheck:
       test:
         - "CMD-SHELL"
@@ -149,8 +141,6 @@ services:
 
   airflow-scheduler:
     <<: *airflow-common
-    networks:
-      - default_net
     command: scheduler
     environment:
       <<: *airflow-common-env
@@ -162,8 +152,6 @@ services:
 
   airflow-webserver:
     <<: *airflow-common
-    networks:
-      - default_net
     command: webserver --port=8484
     ports:
       - "8484:8484"
@@ -174,20 +162,22 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
-  spark:
-    <<: *spark-common
-    hostname: spark
-    ports:
-      - "8383:8282"
-      - "7077:7077"
-
-  spark-worker-1:
-    image: sherri-ice/postgres-spark
-    <<: *spark-common
+#  spark:
+#    <<: *spark-common
+#    hostname: spark
+#    ports:
+#      - "8383:8282"
+#      - "7077:7077"
+#
+#  spark-worker-1:
+#    image: sherri-ice/postgres-spark
+#    <<: *spark-common
 
   localstack:
     image: localstack/localstack:latest
-    container_name: localstack_demo
+    container_name: localstack
+    networks:
+      - default_net
     ports:
       - '4563-4599:4563-4599'
       - '8055:8080'
