@@ -24,9 +24,9 @@ x-airflow-common:
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
 
     # Custom connections
-    AIRFLOW_CONN_SPARK_DEFAULT: 'spark://spark:7077'
+    AIRFLOW_CONN_SPARK_DEFAULT: 'spark://{SPARK_HOSTNAME}:7077'
     # todo: вынести в переменные
-    AIRFLOW_CONN_AWS_DEFAULT: 'aws://test:test@/?endpoint_url=http://localstack:4566&region_name=eu-north-1'
+    AIRFLOW_CONN_AWS_DEFAULT: 'aws://${AWS_ACCESS_KEY}:${AWS_SECRET_KEY}@/?endpoint_url=http://${LOCALSTACK_HOSTNAME}:4566&region_name=${AWS_REGION}'
 
     # Define paths for data
     AIRFLOW_VAR_DATA_PATH: ${AIRFLOW_BASE_PATH}/${DATASET_PATH}
@@ -164,7 +164,7 @@ services:
 
 #  spark:
 #    <<: *spark-common
-#    hostname: spark
+#    hostname: ${SPARK_HOSTNAME}
 #    ports:
 #      - "8383:8282"
 #      - "7077:7077"
@@ -175,7 +175,7 @@ services:
 
   localstack:
     image: localstack/localstack:latest
-    container_name: localstack
+    hostname: ${LOCALSTACK_HOSTNAME}
     networks:
       - default_net
     ports:

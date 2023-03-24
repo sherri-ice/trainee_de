@@ -1,7 +1,7 @@
 provider "aws" {
-  access_key                  = "test"
-  secret_key                  = "test"
-  region                      = "eu-north-1"
+  access_key                  = var.aws.access_key
+  secret_key                  = var.aws.secret_key
+  region                      = var.aws.region
   s3_use_path_style        = true
   skip_credentials_validation = true
   skip_metadata_api_check     = true
