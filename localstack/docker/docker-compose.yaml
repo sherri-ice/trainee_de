@@ -29,8 +29,8 @@ x-airflow-common:
     AIRFLOW_CONN_AWS_DEFAULT: 'aws://${AWS_ACCESS_KEY}:${AWS_SECRET_KEY}@/?endpoint_url=http://${LOCALSTACK_HOSTNAME}:4566&region_name=${AWS_REGION}'
 
     # Define paths for data
-    AIRFLOW_VAR_DATA_PATH: ${AIRFLOW_BASE_PATH}/${DATASET_PATH}
-    AIRFLOW_VAR_SPLIT_CSV_DIR: ${SPLIT_CSV_DIR}
+    AIRFLOW_VAR_DATASET_PATH: ${AIRFLOW_BASE_PATH}/${DATASET_PATH}
+    AIRFLOW_VAR_SPLIT_CSV_DIR:  ${AIRFLOW_BASE_PATH}/${SPLIT_CSV_DIR}
 
     # S3 variables
     AIRFLOW_VAR_S3_BUCKET_NAME: ${S3_BUCKET_NAME}
@@ -41,9 +41,7 @@ x-airflow-common:
   volumes:
     - ../dags:${AIRFLOW_BASE_PATH}/dags
     - ../data:${AIRFLOW_BASE_PATH}/data:z # z stands for shared folder between many containers. See SELinux docs.
-    - ../configs:${AIRFLOW_BASE_PATH}/configs
     - ../spark/app:${SPARK_BASE_PATH}/app
-    - ../spark/resources:${SPARK_BASE_PATH}/resources
   networks:
     - default_net
 
