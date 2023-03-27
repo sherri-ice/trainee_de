@@ -20,7 +20,7 @@ RUN apt-get update && \
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 RUN export JAVA_HOME
 
-
+RUN usermod -u 1000 -g 0 airflow
 USER airflow
 
 WORKDIR /opt/airflow/
