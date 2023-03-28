@@ -1,6 +1,5 @@
 import datetime
 import os
-import re
 
 from airflow.decorators import dag, task, task_group
 from airflow.models import Variable
@@ -41,6 +40,15 @@ def process_bikes():
                            key=f'{[prefix]}/{filename}',
                            replace=True)
 
+    @task
+    def load_file_to_s3(source_path: str, hook: S3Hook, bucket_name: str,
+                        prefix_solver: PrefixSolver = DummyPrefixSolver()):
+        prefix = prefix_solver.get_prefix(source_path)
+        hook.load_file(bucket_name=bucket_name,
+                       filename=source_path,
+                       key=f'{prefix}/{source_path}',
+                       replace=True)
+
     @task_group
     def count_spark_metric_and_save_to_s3():
         count_metrics = SparkSubmitOperator(
@@ -77,7 +85,7 @@ def process_bikes():
             os.remove(os.path.join(dir_path, filename))
         os.rmdir(dir_path)
 
-    csv_wait_sensor \
+    csv_wait_sensor >> load_file_to_s3(dataset_path, s3_hook, s3_bucket_name) \
     >> [group_by_month_and_load_to_s3(),
         count_spark_metric_and_save_to_s3()] \
     >> delete_temp_files.expand(dir_path=[spark_metrics_path])  # todo: add split_csv_path later
