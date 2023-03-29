@@ -184,7 +184,7 @@ services:
       - '4563-4599:4563-4599'
       - '8055:8080'
     environment:
-      - SERVICES=s3
+      - SERVICES=s3,lambda,sqs,sns
       - DEBUG=1
       - DATA_DIR=/var/lib/localstack
     volumes:
