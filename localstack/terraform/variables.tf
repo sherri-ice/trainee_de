@@ -22,13 +22,15 @@ variable "aws" {
 
 variable "lambda" {
   type = object({
-    directory = string
+    source_dir = string
+    zip_dir = string
     role = string
     runtime = string
     timeout = number
   })
   default = {
-    directory = "../lambda"
+    source_dir = "../lambda/source"
+    zip_dir = "../lambda/zip"
     role = "mock_role"
     runtime = "python3.9"
     timeout = 900

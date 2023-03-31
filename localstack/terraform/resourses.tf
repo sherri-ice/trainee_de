@@ -24,6 +24,14 @@ resource "aws_lambda_function" "test_lambda" {
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   runtime          = var.lambda.runtime
   timeout          = var.lambda.timeout
+  environment {
+    variables = {
+      AWS_ENDPOINT_URL = var.aws.endpoint.lambda
+      AWS_ACCESS_KEY   = var.aws.access_key
+      AWS_SECRET_KEY   = var.aws.secret_key
+      AWS_REGION_NAME  = var.aws.region
+    }
+  }
 }
 
 resource "aws_sns_topic_subscription" "sns_subscription_for_test_lambda" {

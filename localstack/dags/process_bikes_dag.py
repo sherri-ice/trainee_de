@@ -36,15 +36,16 @@ def process_bikes():
             prefix = prefix_solver.get_prefix(filename)
             hook.load_file(bucket_name=bucket_name,
                            filename=os.path.join(source_dir_path, filename),
-                           key=f'{[prefix]}/{filename}',
+                           key=f'{prefix}/{filename}',
                            replace=True)
 
     @task
     def load_file_to_s3(source_path: str, hook: S3Hook, bucket_name: str, prefix_solver: PrefixSolver):
+        filename = os.path.basename(source_path)
         prefix = prefix_solver.get_prefix(source_path)
         hook.load_file(bucket_name=bucket_name,
                        filename=source_path,
-                       key=f'{prefix}/{source_path}',
+                       key=f'{prefix}/{filename}',
                        replace=True)
 
     @task_group
@@ -84,7 +85,10 @@ def process_bikes():
             os.remove(os.path.join(dir_path, filename))
         os.rmdir(dir_path)
 
-    csv_wait_sensor >> load_file_to_s3(dataset_path, s3_hook, s3_bucket_name, EchoPrefixSolver("data")) \
+    csv_wait_sensor >> load_file_to_s3(source_path=dataset_path,
+                                       hook=s3_hook,
+                                       bucket_name=s3_bucket_name,
+                                       prefix_solver=EchoPrefixSolver("data")) \
     >> [group_by_month_and_load_to_s3(),
         count_spark_metric_and_save_to_s3()] \
     >> delete_temp_files.expand(dir_path=[spark_metrics_path])  # todo: add split_csv_path later
