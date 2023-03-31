@@ -15,7 +15,10 @@ class YearPrefixSolver(PrefixSolver):
             return year_match.group(1)
 
 
-class DummyPrefixSolver(PrefixSolver):
+class EchoPrefixSolver(PrefixSolver):
+
+    def __init__(self, actual_prefix: str):
+        self._actual_name = actual_prefix
+
     def get_prefix(self, input_str: str) -> Optional[str]:
-        # Just returns 'common' prefix for stand-alone files
-        return 'common'
+        return self._actual_name

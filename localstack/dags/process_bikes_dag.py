@@ -9,7 +9,7 @@ from airflow.sensors.filesystem import FileSensor
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 
 from scripts.split_csv import group_by_month_and_save
-from helpers.prefix_solver import PrefixSolver, DummyPrefixSolver, YearPrefixSolver
+from helpers.prefix_solver import PrefixSolver, EchoPrefixSolver, YearPrefixSolver
 
 default_args = {
     'owner': 'sherri-ice',
@@ -30,8 +30,7 @@ def process_bikes():
     csv_wait_sensor = FileSensor(task_id='csv_wait_sensor', filepath=dataset_path)
 
     @task
-    def load_all_files_to_s3(source_dir_path: str, hook: S3Hook, bucket_name: str,
-                             prefix_solver: PrefixSolver = DummyPrefixSolver()) -> None:
+    def load_all_files_to_s3(source_dir_path: str, hook: S3Hook, bucket_name: str, prefix_solver: PrefixSolver) -> None:
         for filename in os.listdir(source_dir_path):
             # todo: bad code, not extendable
             prefix = prefix_solver.get_prefix(filename)
@@ -41,8 +40,7 @@ def process_bikes():
                            replace=True)
 
     @task
-    def load_file_to_s3(source_path: str, hook: S3Hook, bucket_name: str,
-                        prefix_solver: PrefixSolver = DummyPrefixSolver()):
+    def load_file_to_s3(source_path: str, hook: S3Hook, bucket_name: str, prefix_solver: PrefixSolver):
         prefix = prefix_solver.get_prefix(source_path)
         hook.load_file(bucket_name=bucket_name,
                        filename=source_path,
@@ -62,7 +60,8 @@ def process_bikes():
 
         count_metrics >> load_all_files_to_s3(source_dir_path=spark_metrics_path,
                                               hook=s3_hook,
-                                              bucket_name=s3_bucket_name)
+                                              bucket_name=s3_bucket_name,
+                                              prefix_solver=EchoPrefixSolver("metrics"))
 
     @task_group
     def group_by_month_and_load_to_s3():
@@ -85,7 +84,7 @@ def process_bikes():
             os.remove(os.path.join(dir_path, filename))
         os.rmdir(dir_path)
 
-    csv_wait_sensor >> load_file_to_s3(dataset_path, s3_hook, s3_bucket_name) \
+    csv_wait_sensor >> load_file_to_s3(dataset_path, s3_hook, s3_bucket_name, EchoPrefixSolver("data")) \
     >> [group_by_month_and_load_to_s3(),
         count_spark_metric_and_save_to_s3()] \
     >> delete_temp_files.expand(dir_path=[spark_metrics_path])  # todo: add split_csv_path later
