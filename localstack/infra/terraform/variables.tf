@@ -29,8 +29,8 @@ variable "lambda" {
     timeout = number
   })
   default = {
-    source_dir = "../lambda/source"
-    zip_dir = "../lambda/zip"
+    source_dir = "../../lambda/source"
+    zip_dir = "../../lambda/zip"
     role = "mock_role"
     runtime = "python3.9"
     timeout = 900

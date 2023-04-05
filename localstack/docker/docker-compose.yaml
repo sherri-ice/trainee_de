@@ -188,6 +188,8 @@ services:
       - SERVICES=s3,lambda,sns
       - DEBUG=1
       - DATA_DIR=/var/lib/localstack
+      - LAMBDA_EXECUTOR=docker
+      - LOCALSTACK_HOSTNAME=localstack
     volumes:
       - './.localstack:/var/lib/localstack'
       - '/var/run/docker.sock:/var/run/docker.sock'

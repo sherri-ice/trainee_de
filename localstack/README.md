@@ -30,4 +30,5 @@ rm -r *.dist-info __pycache__
 # todo: написать скрипт который сам все билдит и запускает
 # todo: как внести все в один файл .env
 # todo: описать префиксы
+# todo: заранее ранить лямбда зип
 https://aws.plainenglish.io/end-to-end-pipeline-mocking-with-localstack-and-airflow-mwaa-ac4f019c3a0e

@@ -20,7 +20,6 @@ provider "aws" {
   endpoints {
     s3       = var.aws.endpoint.s3
     lambda   = var.aws.endpoint.lambda
-    sqs      = var.aws.endpoint.sqs
     sns      = var.aws.endpoint.sns
     dynamodb = var.aws.endpoint.dynamodb
   }
