@@ -22,10 +22,9 @@ if __name__ == '__main__':
     lambda_source_path = os.getenv('LAMBDA_SOURCE_PATH')
     depends_path = os.getenv('LAMBDA_DEPENDS_PATH')
     lambda_zip_dir = os.getenv('LAMBDA_ZIP_FOLDER')
-    print(lambda_source_path)
 
-    # for filename in os.listdir(lambda_source_path):
-    #     if not os.path.isdir(os.path.join(lambda_source_path, filename)):
-    #         zip_lambda(lambda_path=os.path.join(lambda_source_path, filename),
-    #                    output_dir=lambda_zip_dir,
-    #                    depends_path=depends_path)
+    for filename in os.listdir(lambda_source_path):
+        if not os.path.isdir(os.path.join(lambda_source_path, filename)):
+            zip_lambda(lambda_path=os.path.join(lambda_source_path, filename),
+                       output_dir=lambda_zip_dir,
+                       depends_path=depends_path)

@@ -11,11 +11,21 @@ variable "aws" {
     region     = "us-east-1"
     endpoint   = {
       dynamodb = "http://localhost:4566"
-      iam      = "http://localhost:4566"
       lambda   = "http://localhost:4566"
       s3       = "http://localhost:4566"
       sns      = "http://localhost:4566"
-      sqs      = "http://localhost:4566"
+    }
+  }
+}
+
+variable "dynamodb" {
+  type = object({
+    capacity = map(number)
+  })
+  default = {
+    capacity = {
+      read  = 10
+      write = 10
     }
   }
 }

@@ -6,6 +6,55 @@ resource "aws_s3_bucket" "helsinki-city-bikes-bucket" {
   bucket = "helsinki-city-bikes"
 }
 
+resource "aws_dynamodb_table" "helsinki-city-bikes-raw-table" {
+  name           = "helsinki_city_bikes_raw"
+  read_capacity  = var.dynamodb.capacity.read
+  write_capacity = var.dynamodb.capacity.write
+  hash_key       = "departure_id"
+  range_key      = "return_id"
+  attribute {
+    name = "departure_id"
+    type = "N"
+  }
+  attribute {
+    name = "return_id"
+    type = "N"
+  }
+}
+
+resource "aws_dynamodb_table" "helsinki-city-bikes-station_metrics-table" {
+  name           = "helsinki_city_bikes_station_metrics"
+  read_capacity  = var.dynamodb.capacity.read
+  write_capacity = var.dynamodb.capacity.write
+  hash_key       = "station_name"
+  attribute {
+    name = "station_name"
+    type = "S"
+  }
+}
+
+resource "aws_dynamodb_table" "helsinki-city-bikes-daily-metrics-table" {
+  name           = "helsinki_city_bikes_daily_metrics"
+  read_capacity  = var.dynamodb.capacity.read
+  write_capacity = var.dynamodb.capacity.write
+  hash_key       = "date"
+  attribute {
+    name = "date"
+    type = "S"
+  }
+}
+
+resource "aws_dynamodb_table" "helsinki-city-bikes-monthly-metrics-table" {
+  name           = "helsinki_city_bikes_monthly_metrics"
+  read_capacity  = var.dynamodb.capacity.read
+  write_capacity = var.dynamodb.capacity.write
+  hash_key       = "date"
+  attribute {
+    name = "date"
+    type = "S"
+  }
+}
+
 resource "aws_s3_bucket_notification" "helsinki-city-bikes-object-created-notification" {
   bucket = aws_s3_bucket.helsinki-city-bikes-bucket.bucket
   topic {
@@ -18,10 +67,9 @@ resource "aws_s3_bucket_notification" "helsinki-city-bikes-object-created-notifi
 
 resource "aws_lambda_function" "test_lambda" {
   function_name    = "test_lambda"
-  filename         = data.archive_file.lambda_zip.output_path
+  filename         = "${var.lambda.zip_dir}/test.zip"
   role             = var.lambda.role
   handler          = "test.lambda_handler"
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   runtime          = var.lambda.runtime
   timeout          = var.lambda.timeout
   environment {
