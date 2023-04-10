@@ -22,5 +22,7 @@ provider "aws" {
     lambda   = var.aws.endpoint.lambda
     sns      = var.aws.endpoint.sns
     dynamodb = var.aws.endpoint.dynamodb
+    sts      = "http://localhost:4566"
+    iam      = "http://localhost:4566"
   }
 }

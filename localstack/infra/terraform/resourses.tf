@@ -63,18 +63,41 @@ resource "aws_s3_bucket_notification" "helsinki-city-bikes-object-created-notifi
     filter_prefix = "data"
     filter_suffix = ".csv"
   }
+
+  topic {
+    topic_arn     = aws_sns_topic.sns_topic_s3_bikes_bucket_updates.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = "metrics"
+    filter_suffix = ".csv"
+  }
 }
 
-resource "aws_lambda_function" "test_lambda" {
-  function_name    = "test_lambda"
-  filename         = "${var.lambda.zip_dir}/test.zip"
-  role             = var.lambda.role
-  handler          = "test.lambda_handler"
+resource aws_iam_policy lambda_s3 {
+  name        = "lambda-s3-permissions"
+  description = "Contains S3 read permission for lambda"
+  policy      = data.aws_iam_policy_document.lambda_s3.json
+}
+
+resource aws_iam_role lambda_role {
+  name               = "lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource aws_iam_role_policy_attachment lambda_s3 {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.lambda_s3.arn
+}
+
+resource "aws_lambda_function" "lambda_load_data_to_dynamodb" {
+  function_name    = "lambda_load_data_to_dynamodb"
+  filename         = data.local_file.lambda_load_data_to_dynamodb_zip.filename
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "lambda_load_data_to_dynamodb.lambda_handler"
   runtime          = var.lambda.runtime
   timeout          = var.lambda.timeout
+  source_code_hash = data.local_file.lambda_load_data_to_dynamodb_zip.content_base64
   environment {
     variables = {
-      AWS_ENDPOINT_URL = var.aws.endpoint.lambda
       AWS_ACCESS_KEY   = var.aws.access_key
       AWS_SECRET_KEY   = var.aws.secret_key
       AWS_REGION_NAME  = var.aws.region
@@ -83,7 +106,7 @@ resource "aws_lambda_function" "test_lambda" {
 }
 
 resource "aws_sns_topic_subscription" "sns_subscription_for_test_lambda" {
-  endpoint  = aws_lambda_function.test_lambda.arn
+  endpoint  = aws_lambda_function.lambda_load_data_to_dynamodb.arn
   protocol  = "lambda"
   topic_arn = aws_sns_topic.sns_topic_s3_bikes_bucket_updates.arn
 }
