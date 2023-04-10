@@ -8,4 +8,4 @@ run:
 	cd infra/terraform && terraform init && terraform apply -auto-approve
 
 down:
-	docker compose down
+	cd docker/ && docker compose down
