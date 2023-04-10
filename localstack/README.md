@@ -82,3 +82,6 @@ Also script sures that zipped Lambda meets size [limits](https://lumigo.io/aws-l
 ## Dynamodb
 Scan of helsinki_city_bikes_monthly_metrics table:
 ![dynamodb.png](docs%2Fdynamodb.png)
+
+## Tableau:
+![tableau.png](docs%2Ftableau.png)
