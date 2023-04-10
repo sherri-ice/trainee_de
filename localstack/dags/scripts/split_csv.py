@@ -5,10 +5,6 @@ import pandas as pd
 
 
 def group_by_month_and_save(dataset_path: str, output_dir_path: str) -> None:
-    # todo: delete this check before final version
-    if len(os.listdir(output_dir_path)) > 0:
-        return
-
     # Schema for faster parsing. The real data types are mixed up due to heterogeneity of provided data.
     schema = {
         'departure': str,  # will be parsed as Timestamp

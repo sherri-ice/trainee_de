@@ -32,7 +32,6 @@ def process_bikes():
     @task
     def load_all_files_to_s3(source_dir_path: str, hook: S3Hook, bucket_name: str, prefix_solver: PrefixSolver) -> None:
         for filename in os.listdir(source_dir_path):
-            # todo: bad code, not extendable
             prefix = prefix_solver.get_prefix(filename)
             hook.load_file(bucket_name=bucket_name,
                            filename=os.path.join(source_dir_path, filename),
@@ -91,7 +90,7 @@ def process_bikes():
                                        prefix_solver=EchoPrefixSolver("data")) \
     >> [group_by_month_and_load_to_s3(),
         count_spark_metric_and_save_to_s3()] \
-    >> delete_temp_files.expand(dir_path=[spark_metrics_path])  # todo: add split_csv_path later
+    >> delete_temp_files.expand(dir_path=[spark_metrics_path, split_csv_dir])
 
 
 process_bikes()
