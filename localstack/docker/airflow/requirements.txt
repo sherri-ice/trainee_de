@@ -1,0 +1,5 @@
+pandas
+psycopg2-binary
+apache-airflow-providers-redis
+apache-airflow-providers-apache-spark
+apache-airflow-providers-amazon

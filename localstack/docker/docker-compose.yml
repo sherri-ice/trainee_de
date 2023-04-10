@@ -1,0 +1,204 @@
+version: '3.8'
+
+x-airflow-common:
+  &airflow-common
+  image: sherri-ice/airflow
+  user: airflow
+  environment:
+    &airflow-common-env
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+
+    # Celery executor
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+    AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+
+    # Backend flask settings
+    AIRFLOW__CORE__FERNET_KEY: ''
+    AIRFLOW__WEBSERVER__SECRET_KEY: 'secret' # should be really random, though it's not production code :)
+
+    # Core
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'false'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__CORE__ENABLE_XCOM_PICKLING: 'true' # for json reading
+    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
+
+    # Custom connections
+    AIRFLOW_CONN_SPARK_DEFAULT: spark://${SPARK_HOSTNAME}:7077
+
+    # AWS connection
+    AIRFLOW_CONN_AWS_DEFAULT: aws://${AWS_ACCESS_KEY}:${AWS_SECRET_KEY}@/?endpoint_url=http://${LOCALSTACK_HOSTNAME}:4566&region_name=${AWS_REGION}
+
+    # Define paths for data
+    AIRFLOW_VAR_DATASET_PATH: ${AIRFLOW_BASE_PATH}/${DATASET_PATH}
+    AIRFLOW_VAR_SPLIT_CSV_DIR: ${AIRFLOW_BASE_PATH}/${SPLIT_CSV_DIR}
+
+    # S3 variables
+    AIRFLOW_VAR_S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+
+    # Spark variables path
+    AIRFLOW_VAR_SPARK_SCRIPTS_PATH: ${SPARK_BASE_PATH}/app/
+    AIRFLOW_VAR_SPARK_METRICS_PATH: ${AIRFLOW_BASE_PATH}/${SPARK_METRICS_PATH}
+
+  volumes:
+    - ../dags:${AIRFLOW_BASE_PATH}/dags
+    - ../data:${AIRFLOW_BASE_PATH}/data:z # z stands for shared folder between many containers. See SELinux docs.
+    - ../spark/app:${SPARK_BASE_PATH}/app
+  networks:
+    - ls
+
+  depends_on:
+    &airflow-common-depends-on
+    redis:
+      condition: service_healthy
+    postgres:
+      condition: service_healthy
+
+x-spark-common:
+  &spark-common
+  image: sherri-ice/postgres-spark
+  networks:
+    - ls
+  environment:
+    - SPARK_RPC_AUTHENTICATION_ENABLED=no
+    - SPARK_RPC_ENCRYPTION_ENABLED=no
+    - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+    - SPARK_SSL_ENABLED=no
+  volumes:
+    - ../spark/app:${SPARK_BASE_PATH}/app
+
+services:
+  postgres:
+    image: postgres:13
+    networks:
+      - ls
+    hostname: postgresql
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "airflow" ]
+      interval: 5s
+      retries: 5
+    restart: always
+
+  redis:
+    image: redis:latest
+    networks:
+      - ls
+    expose:
+      - 6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    restart: always
+
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        mkdir -p /sources/logs /sources/dags
+        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags}
+        exec /entrypoint airflow db init
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_UPGRADE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: airflow
+      _AIRFLOW_WWW_USER_PASSWORD: airflow
+    user: "0:0"
+
+  airflow-worker:
+    <<: *airflow-common
+    command: celery worker
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - 'celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    environment:
+      <<: *airflow-common-env
+      DUMB_INIT_SETSID: "0"
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    environment:
+      <<: *airflow-common-env
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver --port=8484
+    ports:
+      - "8484:8484"
+    environment:
+      <<: *airflow-common-env
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  spark:
+    <<: *spark-common
+    hostname: ${SPARK_HOSTNAME}
+    ports:
+      - "8383:8282"
+      - "7077:7077"
+    environment:
+      - SPARK_MODE=master
+
+  spark-worker-1:
+    image: sherri-ice/postgres-spark
+    <<: *spark-common
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=1
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack_main
+    hostname: ${LOCALSTACK_HOSTNAME}
+    networks:
+      - ls
+    ports:
+      - "4566:4566"
+      - "4510-4559:4510-4559"
+    environment:
+      - SERVICES=s3,lambda,sns,dynamodb,sts,iam
+      - DEBUG=1
+      - DATA_DIR=/var/lib/localstack
+      - LAMBDA_EXECUTOR=docker-reuse
+      - LOCALSTACK_HOSTNAME=localstack
+      - MAIN_DOCKER_NETWORK=ls
+    volumes:
+      - './.localstack:/var/lib/localstack'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+
+volumes:
+  postgres-db-volume:
+
+networks:
+  ls:
+    name: ls
