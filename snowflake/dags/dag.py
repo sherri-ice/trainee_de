@@ -8,7 +8,7 @@ from snowflake.connector import SnowflakeConnection
 from snowflake.connector.cursor import SnowflakeCursor
 from snowflake.connector.pandas_tools import write_pandas
 
-from sql_helper import get_all_table_creation_queries
+from sql_helper import SqlSaveStatements
 
 default_args = {
     'owner': 'sherri-ice'
@@ -17,6 +17,8 @@ default_args = {
 
 @dag(default_args=default_args, schedule=None, start_date=datetime.utcnow(), catchup=False)
 def tasks_flow():
+    sql_statements = SqlSaveStatements()
+
     @task
     def read_csv(file_path: str) -> pd.DataFrame:
         data = pd.read_csv(file_path, index_col=False)
@@ -31,10 +33,12 @@ def tasks_flow():
 
         @task
         def create_data_stream(stream_name: str, table_name: str) -> None:
-            snowflake_cursor.execute(f'CREATE STREAM IF NOT EXISTS {stream_name} ON TABLE {table_name}')
+            # Get safe predefined sql statement
+            sql_statement = sql_statements.get_create_stream_statement(stream_name, table_name)
+            snowflake_cursor.execute(sql_statement)
 
         project_base_path = Variable.get('PROJECT_BASE_DIR')
-        sql_queries = get_all_table_creation_queries(project_base_path)
+        sql_queries = sql_statements.get_all_table_creation_queries(project_base_path)
 
         create_table.expand(table_sql_query=sql_queries) >> \
         create_data_stream.expand_kwargs(
