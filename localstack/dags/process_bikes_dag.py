@@ -9,7 +9,7 @@ from airflow.sensors.filesystem import FileSensor
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 
 from scripts.split_csv import group_by_month_and_save
-from helpers.prefix_solver import PrefixSolver, EchoPrefixSolver, YearPrefixSolver
+from helpers.prefix_solver import PrefixSolver, PredefinedPrefixSolver, YearPrefixSolver
 
 default_args = {
     'owner': 'sherri-ice',
@@ -61,7 +61,7 @@ def process_bikes():
         count_metrics >> load_all_files_to_s3(source_dir_path=spark_metrics_path,
                                               hook=s3_hook,
                                               bucket_name=s3_bucket_name,
-                                              prefix_solver=EchoPrefixSolver("metrics"))
+                                              prefix_solver=PredefinedPrefixSolver("metrics"))
 
     @task_group
     def group_by_month_and_load_to_s3():
@@ -87,7 +87,7 @@ def process_bikes():
     csv_wait_sensor >> load_file_to_s3(source_path=dataset_path,
                                        hook=s3_hook,
                                        bucket_name=s3_bucket_name,
-                                       prefix_solver=EchoPrefixSolver("data")) \
+                                       prefix_solver=PredefinedPrefixSolver("data")) \
     >> [group_by_month_and_load_to_s3(),
         count_spark_metric_and_save_to_s3()] \
     >> delete_temp_files.expand(dir_path=[spark_metrics_path, split_csv_dir])
