@@ -16,6 +16,7 @@ Starting the Master node:
 ![img_4.png](images/img_4.png)
 
 ### Executing code with History Server
+http://<server-url>:18080
 spark-default.conf, added logging:
 
 ![img_5.png](images/img_5.png)
