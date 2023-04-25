@@ -44,7 +44,7 @@ _Notice: all AWS infrastructure (except Dynamodb tables) will be wiped._
 
 ## Notes about Lambda
 
-Though `lambda` uses numpy and `pandas`, the special version of these packages is needed.
+Though `lambda` uses `numpy` and `pandas`, the special version of these packages is needed.
 AWS Lambda needs version which works with AWS Linux environment. For right import you can use Layers as described [here](https://sease.io/2022/11/how-to-import-pandas-in-aws-lambda.html).
 
 
@@ -60,7 +60,7 @@ rm -r *.dist-info __pycache__
 ```
 
 ### Lambda distribution
-For creation Lambda functions following [script](infra%2Fscripts%2Fzip_lambdas.py) zips all source Python files. 
+For creating Lambda functions following [script](infra%2Fscripts%2Fzip_lambdas.py) zips all source Python files. 
 Also script sures that zipped Lambda meets size [limits](https://lumigo.io/aws-lambda-performance-optimization/aws-lambda-limits/).
 
 ## AWS infrastructure 
