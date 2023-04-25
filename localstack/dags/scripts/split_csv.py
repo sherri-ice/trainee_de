@@ -5,6 +5,17 @@ import pandas as pd
 
 
 def group_by_month_and_save(dataset_path: str, output_dir_path: str) -> None:
+    """
+    The group_by_month_and_save function takes a dataset path and an output directory path as arguments.
+    It reads the data from the dataset with specified schema, groups it by month and saves each group in
+    a separate file. The files are saved in the output directory with names corresponding to their respective
+    months.
+
+    :param dataset_path: str: Specify the path to the dataset
+    :param output_dir_path: str: Specify the directory where the output files will be saved
+    :return: None
+    """
+
     # Schema for faster parsing. The real data types are mixed up due to heterogeneity of provided data.
     schema = {
         'departure': str,  # will be parsed as Timestamp
